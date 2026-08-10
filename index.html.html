@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MAF - Panel del Asesor</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+  Chart.register(ChartDataLabels);
+  Chart.defaults.set('plugins.datalabels', { display: false });
+</script>
+<style>
+  :root {
+    --navy:#1a3a5c; --navy-dark:#12283f; --blue:#2d5a8e;
+    --blue-light:#eaf2fb; --blue-soft:#d4e8f7; --slate:#334155;
+    --slate-soft:#64748b; --slate-lighter:#94a3b8; --bg:#f4f6f9;
+    --card:#ffffff; --border:#dde6f0; --panel:#f8fafc;
+    --success:#0d9488; --success-bg:#d1fae5; --warning:#b45309;
+    --warning-bg:#fef3c7; --danger:#dc2626; --danger-bg:#fee2e2;
+    --purple:#6d28d9; --purple-bg:#ede9fe; --gold:#b8860b;
+  }
+  * { box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; }
+  body { background:var(--bg); color:var(--slate); margin:0; padding:20px; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  h3 { font-size:14px; margin:0 0 10px 0; color:var(--navy); }
+  .subtitle { color:var(--slate-soft); font-size:13px; margin-bottom:16px; }
+  .header-banner { background:linear-gradient(135deg,var(--navy-dark),var(--navy)); border-radius:14px; padding:18px 22px; margin-bottom:20px; box-shadow:0 2px 8px rgba(26,58,92,0.25); }
+  .header-banner h1 { color:#fff; margin-bottom:6px; }
+  .header-banner .subtitle { color:var(--blue-soft); margin-bottom:0; }
+  .seccion { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:28px; box-shadow:0 1px 4px rgba(26,58,92,0.06); }
+  .toolbar { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  button { background:var(--blue); color:white; border:none; padding:9px 15px; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px; transition:background 0.15s; }
+  button:hover { background:var(--navy); }
+  button.secondary { background:var(--panel); color:var(--slate); border:1px solid var(--border); }
+  button.secondary:hover { background:var(--blue-light); }
+  select { background:#fff; color:var(--slate); border:1px solid var(--border); padding:8px 12px; border-radius:8px; min-width:200px; font-size:13px; }
+  input[type=text] { background:#fff; color:var(--slate); border:1px solid var(--border); padding:7px 10px; border-radius:8px; font-size:13px; }
+  .filtro-label { font-size:12.5px; color:var(--slate-soft); }
+  .panel { background:var(--panel); border-radius:10px; padding:16px; border:1px solid var(--border); overflow-x:auto; }
+  .grid2b { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+  .scroll-inner { overflow-y:auto; flex:1; margin-top:10px; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; min-width:600px; }
+  th,td { padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+  th { color:var(--slate-soft); font-size:11px; text-transform:uppercase; }
+  .estado-msg { color:var(--slate-soft); font-size:13px; padding:20px; text-align:center; }
+  .fila-urgente { background:#fff5f5; }
+  .fila-atencion { background:#fffbeb; }
+  .fila-total-general { font-weight:700; background:var(--blue-light); border-top:2px solid var(--border); }
+  /* MULTISELECT */
+  .multiselect { position:relative; display:inline-block; }
+  .multiselect-btn { background:#fff; color:var(--slate); border:1px solid var(--border); padding:8px 12px; border-radius:8px; min-width:180px; font-size:13px; text-align:left; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; }
+  .multiselect-btn:hover { background:var(--panel); }
+  .ms-arrow { color:var(--slate-soft); font-size:11px; }
+  .multiselect-panel { display:none; position:absolute; top:calc(100% + 4px); left:0; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 16px rgba(26,58,92,0.15); width:280px; height:300px; z-index:50; padding:8px 8px 18px 8px; overflow:auto; resize:both; }
+  .multiselect-panel.open { display:flex; flex-direction:column; }
+  .multiselect-panel.open::after { content:"⇲"; position:absolute; bottom:1px; right:3px; font-size:11px; color:var(--slate-lighter); pointer-events:none; }
+  .ms-search { width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px; margin-bottom:8px; box-sizing:border-box; flex-shrink:0; }
+  .ms-select-all { display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--blue); padding:6px 4px; border-bottom:1px solid var(--border); margin-bottom:4px; cursor:pointer; flex-shrink:0; }
+  .ms-options { flex:1; overflow-y:auto; min-height:60px; }
+  .ms-option { display:flex; align-items:center; gap:6px; font-size:12.5px; padding:6px 4px; cursor:pointer; border-radius:4px; }
+  .ms-option:hover { background:var(--panel); }
+  .ms-empty { font-size:12.5px; color:var(--slate-soft); text-align:center; padding:10px; }
+  .multiselect input[type=checkbox] { accent-color:var(--blue); cursor:pointer; }
+  /* SELECTOR BANNER */
+  .agente-selector-banner { background:linear-gradient(135deg,#0f4c81,#1a6bb5); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; box-shadow:0 2px 8px rgba(15,76,129,0.2); }
+  .agente-selector-banner label { color:#bfdbfe; font-size:13px; font-weight:600; }
+  .agente-selector-banner select { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); padding:8px 14px; border-radius:8px; font-size:14px; font-weight:700; min-width:280px; cursor:pointer; }
+  .agente-selector-banner select option { background:#1a3a5c; color:#fff; }
+  .agente-nombre-display { color:#fff; font-size:18px; font-weight:800; flex:1; }
+  .agente-fecha-display { color:#93c5fd; font-size:12px; }
+  /* KPI AGENTE */
+  .kpi-agente-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px; }
+  .kpi-agente-card { background:var(--card); border-radius:12px; padding:16px; border:1px solid var(--border); box-shadow:0 2px 6px rgba(26,58,92,0.07); position:relative; overflow:hidden; }
+  .kpi-agente-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:12px 12px 0 0; }
+  .kpi-agente-card.kac-azul::before { background:#2563eb; }
+  .kpi-agente-card.kac-verde::before { background:#16a34a; }
+  .kpi-agente-card.kac-naranja::before { background:#ea580c; }
+  .kpi-agente-card.kac-morado::before { background:#7c3aed; }
+  .kpi-agente-card.kac-teal::before { background:#0d9488; }
+  .kpi-agente-card.kac-gold::before { background:#ca8a04; }
+  .kpi-agente-card .ka-label { font-size:11px; color:var(--slate-soft); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; }
+  .kpi-agente-card .ka-value { font-size:26px; font-weight:800; color:var(--navy); margin:6px 0 2px 0; line-height:1; }
+  .kpi-agente-card .ka-sub { font-size:11px; color:var(--slate-lighter); }
+  .kpi-agente-card .ka-semaforo { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; margin-top:6px; }
+  .ka-sem-verde { background:var(--success-bg); color:#166534; }
+  .ka-sem-amarillo { background:var(--warning-bg); color:#92400e; }
+  .ka-sem-rojo { background:var(--danger-bg); color:#b91c1c; }
+  /* TIPO CUOTA CARDS */
+  .tipo-cuota-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
+  .tc-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; border-left:4px solid transparent; }
+  .tc-card-normal { border-left-color:#2563eb; }
+  .tc-card-balon { border-left-color:#7c3aed; }
+  .tc-card-bigticket { border-left-color:#ea580c; }
+  .tc-card-taxi { border-left-color:#0d9488; }
+  .tc-card-top { border-left-color:#ca8a04; }
+  .tc-card-otro { border-left-color:var(--slate-lighter); }
+  .tc-card .tc-tipo { font-size:11px; font-weight:700; text-transform:uppercase; color:var(--slate-soft); }
+  .tc-card .tc-q { font-size:20px; font-weight:800; color:var(--navy); margin:4px 0 2px 0; }
+  .tc-card .tc-ef { font-size:12px; color:var(--slate-soft); }
+  .tc-card .tc-monto { font-size:11px; color:var(--slate-lighter); margin-top:2px; }
+  /* TABLA PRIORITARIAS */
+  .tabla-prioritarias { min-width:700px; }
+  .tabla-prioritarias th { font-size:11px; }
+  .tabla-prioritarias td { font-size:12.5px; padding:9px 10px; }
+  /* SBS BADGES */
+  .sbs-normal { background:var(--success-bg); color:#166534; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
+  .sbs-cpp { background:var(--warning-bg); color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
+  .sbs-deficiente { background:#ffedd5; color:#9a3412; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
+  .sbs-dudoso { background:var(--danger-bg); color:#b91c1c; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
+  .sbs-perdida { background:#4c1d95; color:#fff; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
+  /* PANEL IA */
+  .ia-panel { background:linear-gradient(135deg,#0f172a,#1e3a5f); border-radius:14px; padding:20px 24px; margin-bottom:20px; color:#e2e8f0; box-shadow:0 4px 20px rgba(15,23,42,0.3); }
+  .ia-panel h3 { color:#93c5fd; margin-bottom:4px; font-size:15px; }
+  .ia-panel .ia-subtitle { color:#64748b; font-size:12px; margin-bottom:16px; }
+  .ia-acciones-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:16px; }
+  .ia-accion-card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:14px 16px; transition:background 0.2s; }
+  .ia-accion-card:hover { background:rgba(255,255,255,0.1); }
+  .ia-accion-card .ia-tipo { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .ia-tipo-urgente { color:#f87171; }
+  .ia-tipo-promesa { color:#34d399; }
+  .ia-tipo-seguim { color:#60a5fa; }
+  .ia-tipo-campo { color:#fbbf24; }
+  .ia-tipo-riesgo { color:#c084fc; }
+  .ia-accion-card .ia-titulo { font-size:13px; font-weight:700; color:#f1f5f9; margin-bottom:4px; }
+  .ia-accion-card .ia-desc { font-size:12px; color:#94a3b8; line-height:1.5; margin-bottom:10px; }
+  .ia-accion-card .ia-cuentas { font-size:11px; color:#64748b; margin-bottom:10px; }
+  .ia-accion-card .ia-cuentas strong { color:#e2e8f0; }
+  .ia-btn { background:rgba(59,130,246,0.2); border:1px solid rgba(59,130,246,0.4); color:#93c5fd; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; width:100%; }
+  .ia-btn:hover { background:rgba(59,130,246,0.4); color:#fff; }
+  .ia-btn-urgente { border-color:rgba(248,113,113,0.5); color:#fca5a5; background:rgba(248,113,113,0.1); }
+  .ia-btn-urgente:hover { background:rgba(248,113,113,0.3); color:#fff; }
+  .ia-btn-verde { border-color:rgba(52,211,153,0.5); color:#6ee7b7; background:rgba(52,211,153,0.1); }
+  .ia-btn-verde:hover { background:rgba(52,211,153,0.3); color:#fff; }
+  .ia-resumen-ia { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:14px 16px; font-size:12.5px; color:#94a3b8; line-height:1.8; }
+  .ia-resumen-ia b { color:#e2e8f0; }
+  .ia-tag { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:700; margin:2px 3px; }
+  .ia-tag-rojo { background:rgba(248,113,113,0.2); color:#fca5a5; }
+  .ia-tag-verde { background:rgba(52,211,153,0.2); color:#6ee7b7; }
+  .ia-tag-amarillo { background:rgba(251,191,36,0.2); color:#fde68a; }
+  /* MODAL IA */
+  .ia-modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+  .ia-modal-overlay.open { display:flex; }
+  .ia-modal { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:24px; max-width:900px; width:95%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+  .ia-modal h3 { color:#93c5fd; margin-bottom:4px; }
+  .ia-modal .ia-modal-sub { color:#64748b; font-size:12px; margin-bottom:14px; }
+  .ia-modal-body { overflow-y:auto; flex:1; }
+  .ia-modal-body table { min-width:600px; }
+  .ia-modal-body th { background:#0f172a; color:#64748b; }
+  .ia-modal-body td { color:#e2e8f0; border-bottom:1px solid #1e293b; }
+  .ia-modal-body tr:hover td { background:rgba(255,255,255,0.04); }
+  .ia-modal-close { background:rgba(248,113,113,0.2); border:1px solid rgba(248,113,113,0.4); color:#fca5a5; padding:8px 20px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:14px; align-self:flex-end; }
+  .ia-modal-close:hover { background:rgba(248,113,113,0.4); color:#fff; }
+  /* ACCIÓN SUGERIDA BADGES */
+.accion-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
+.accion-llamar    { background:#dbeafe; color:#1d4ed8; }
+.accion-promesa   { background:#d1fae5; color:#065f46; }
+.accion-campo     { background:#fef3c7; color:#92400e; }
+.accion-legal     { background:#ede9fe; color:#5b21b6; }
+.accion-whatsapp  { background:#dcfce7; color:#166534; }
+.accion-escalar   { background:#fee2e2; color:#991b1b; }
+.accion-confirmar { background:#e0f2fe; color:#075985; }
+
+/* TOAST */
+  .toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:#e2e8f0; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.4); z-index:2000; transform:translateY(80px); opacity:0; transition:all 0.3s ease; border-left:4px solid #3b82f6; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.toast-ok { border-left-color:#34d399; }
+  .toast.toast-warn { border-left-color:#fbbf24; }
+  .toast.toast-err { border-left-color:#f87171; }
+</style>
+</head>
+<body>
+
+<div class="header-banner">
+  <h1>📊 MAF — Panel del Asesor de Cobranza</h1>
+  <div class="subtitle" id="fileInfo">Ningún archivo cargado. Haz clic en "Actualizar Datos" para comenzar.</div>
+</div>
+
+<div class="toolbar">
+  <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+  <button onclick="document.getElementById('fileInput').click()">📁 Actualizar Datos</button>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<div class="seccion">
+
+  <!-- ── Selector de agente + filtros ── -->
+  <div class="agente-selector-banner">
+    <div>
+      <label>👤 Selecciona tu agente</label>
+      <div style="margin-top:6px;">
+        <select id="selectorAgentePanel" onchange="renderMiPanel()">
+          <option value="">— Carga un archivo primero —</option>
+        </select>
+      </div>
+    </div>
+    <div style="flex:1;">
+      <div class="agente-nombre-display" id="agenteNombreDisplay">Sin selección</div>
+      <div class="agente-fecha-display" id="agenteFechaDisplay">—</div>
+    </div>
+    <!-- Filtro Ciclo -->
+    <div class="multiselect" id="msCicloPanel">
+      <button class="multiselect-btn" onclick="toggleMultiselect('msCicloPanel')" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
+        <span id="msCicloPanel_label">Todos los Ciclos</span><span class="ms-arrow" style="color:#93c5fd;">▾</span>
+      </button>
+      <div class="multiselect-panel" id="msCicloPanel_panel">
+        <input type="text" class="ms-search" placeholder="Buscar ciclo..." oninput="filtrarOpcionesMultiselect('msCicloPanel',this.value)">
+        <label class="ms-select-all"><input type="checkbox" id="msCicloPanel_all" onchange="toggleSeleccionarTodoMultiselect('msCicloPanel')"> Seleccionar todos</label>
+        <div class="ms-options" id="msCicloPanel_options"></div>
+      </div>
+    </div>
+    <!-- Filtro Mes -->
+    <div class="multiselect" id="msMesPanel">
+      <button class="multiselect-btn" onclick="toggleMultiselect('msMesPanel')" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
+        <span id="msMesPanel_label">Todos los Meses</span><span class="ms-arrow" style="color:#93c5fd;">▾</span>
+      </button>
+      <div class="multiselect-panel" id="msMesPanel_panel">
+        <input type="text" class="ms-search" placeholder="Buscar mes..." oninput="filtrarOpcionesMultiselect('msMesPanel',this.value)">
+        <label class="ms-select-all"><input type="checkbox" id="msMesPanel_all" onchange="toggleSeleccionarTodoMultiselect('msMesPanel')"> Seleccionar todos</label>
+        <div class="ms-options" id="msMesPanel_options"></div>
+      </div>
+    </div>
+    <!-- Filtro Estado -->
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label style="color:#bfdbfe;font-size:12px;font-weight:600;">🔔 Estado de Cuenta</label>
+      <div class="multiselect" id="msEstadoPanel">
+        <button class="multiselect-btn" onclick="toggleMultiselect('msEstadoPanel')" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
+          <span id="msEstadoPanel_label">Todos los Estados</span><span class="ms-arrow" style="color:#93c5fd;">▾</span>
+        </button>
+        <div class="multiselect-panel" id="msEstadoPanel_panel">
+          <input type="text" class="ms-search" placeholder="Buscar estado..." oninput="filtrarOpcionesMultiselect('msEstadoPanel',this.value)">
+          <label class="ms-select-all"><input type="checkbox" id="msEstadoPanel_all" onchange="toggleSeleccionarTodoMultiselect('msEstadoPanel')"> Seleccionar todos</label>
+          <div class="ms-options" id="msEstadoPanel_options"></div>
+        </div>
+      </div>
+    </div>
+    <button class="secondary" onclick="resetFiltrosPanel()" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">🔄 Limpiar</button>
+  </div>
+
+  <!-- ── KPIs ── -->
+  <div id="panelKPIsAgente">
+    <div class="estado-msg">Carga un archivo y selecciona un agente para ver su panel.</div>
+  </div>
+
+  <!-- ── Tipo de Cuota + Canal ── -->
+  <div class="grid2b" style="margin-bottom:20px;">
+    <div class="panel">
+      <h3>💳 Cartera por Tipo de Cuota</h3>
+      <div class="subtitle">Distribución de cuentas y efectividad por producto.</div>
+      <div id="panelTipoCuotaCards"><div class="estado-msg">Sin datos.</div></div>
+      <div style="position:relative;height:180px;margin-top:14px;"><canvas id="chartAgenteTC"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>📡 Efectividad por Canal — Este Agente</h3>
+      <div class="subtitle">Comparativa de contactabilidad y promesas por canal de gestión.</div>
+      <div id="panelCanalAgente"><div class="estado-msg">Sin datos.</div></div>
+      <div style="position:relative;height:180px;margin-top:14px;"><canvas id="chartAgenteCanal"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── Gestiones diarias + Recupero ── -->
+  <div class="grid2b" style="margin-bottom:20px;">
+    <div class="panel">
+      <h3>📅 Gestiones Call Center por Fecha</h3>
+      <div class="subtitle">Actividad diaria del agente seleccionado.</div>
+      <div style="position:relative;height:220px;"><canvas id="chartAgenteGestionDiaria"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>💰 Recupero por Fecha de Pago (con acumulado)</h3>
+      <div class="subtitle">Pagos diarios y curva acumulada del agente.</div>
+      <div style="position:relative;height:220px;"><canvas id="chartAgenteRecuperoDiario"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ── Detalle tipo cuota ── -->
+  <div class="panel" style="margin-bottom:20px;">
+    <h3>📋 Detalle de Cobranza por Tipo de Cuota</h3>
+    <div class="subtitle">Resumen de efectividad por producto.</div>
+    <table style="min-width:500px;">
+      <thead><tr>
+        <th>Tipo de Cuota</th><th>Q Total</th><th>Con Pago</th><th>Sin Pago</th>
+        <th>Cuota Dolarizada</th><th>% Efectividad</th>
+      </tr></thead>
+      <tbody id="panelTablaDetalleTipoCuota">
+        <tr><td colspan="6" class="estado-msg">Selecciona un agente.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<!-- ── Cuentas Prioritarias ── -->
+<div style="margin-bottom:20px;">
+  <div style="background:var(--panel);border-radius:10px;border:1px solid var(--border);padding:16px;">
+    <h3>🚨 Mis Cuentas Prioritarias — Acción Inmediata</h3>
+    <div class="subtitle">Top cuentas sin pago ordenadas por score de prioridad (SBS × Mora × Monto).</div>
+    <div style="overflow-x:auto;overflow-y:auto;max-height:420px;width:100%;">
+      <table class="tabla-prioritarias" style="min-width:1200px;width:100%;">
+        <thead>
+          <tr>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">#</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:180px;">Cliente</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Ciclo</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tramo</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cuota USD</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Días Venc.</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">SBS</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Score</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Gestiones</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Mejor Contacto</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Estado (NP0)</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Motivo (NP1)</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Últ. Fecha Gestión</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:220px;">🤖 Acción Sugerida</th>
+          </tr>
+        </thead>
+        <tbody id="panelAlertasAgente">
+          <tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  <!-- ── Panel IA ── -->
+  <div class="ia-panel" id="panelAccionesIA">
+    <h3> Gestión Inteligente de Cartera</h3>
+    <div class="ia-subtitle">Análisis automático basado en toda la cartera del agente. Se actualiza al cambiar filtros.</div>
+    <div class="ia-acciones-grid" id="iaAccionesGrid">
+      <div class="estado-msg" style="color:#64748b;">Selecciona un agente para generar acciones.</div>
+    </div>
+    <div class="ia-resumen-ia" id="iaResumenTexto" style="display:none;"></div>
+  </div>
+
+  <!-- ── Motivos NP0 / NP1 ── -->
+  <div class="grid2b" style="margin-bottom:0;">
+    <div class="panel">
+      <h3>🗣️ Causas de No Pago (NP0 — Estado)</h3>
+      <table style="min-width:300px;">
+        <thead><tr><th>#</th><th>Estado</th><th>Cuentas</th><th>%</th></tr></thead>
+        <tbody id="panelMotivosNP0Agente"><tr><td colspan="4" class="estado-msg">Sin datos.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>🗣️ Causas de No Pago (NP1 — Motivo)</h3>
+      <table style="min-width:300px;">
+        <thead><tr><th>#</th><th>Motivo</th><th>Cuentas</th><th>%</th></tr></thead>
+        <tbody id="panelMotivosNP1Agente"><tr><td colspan="4" class="estado-msg">Sin datos.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- ── Gestiones por Canal Automatizado ── -->
+  <div class="panel" style="margin-top:20px;">
+    <h3>📡 Gestiones por Canal Automatizado</h3>
+    <div class="subtitle">Volumen IVR, Email y SMS — referencial, no incluido en KPI del asesor.</div>
+    <table style="min-width:400px;">
+      <thead>
+        <tr>
+          <th>Canal</th>
+          <th>Total Gestiones</th>
+          <th>% del Total Automatizado</th>
+          <th>Cuentas con Gestión</th>
+          <th>Promedio por Cuenta</th>
+        </tr>
+      </thead>
+      <tbody id="tablaCanalesAutomatizados">
+        <tr><td colspan="5" class="estado-msg">Selecciona un agente.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- fin .seccion -->
+
+<!-- Modal IA -->
+<div class="ia-modal-overlay" id="iaModalOverlay" onclick="if(event.target===this)cerrarModalIA()">
+  <div class="ia-modal">
+    <h3 id="iaModalTitulo">Detalle de Cuentas</h3>
+    <div class="ia-modal-sub" id="iaModalSub"></div>
+    <div class="ia-modal-body">
+      <table>
+        <thead><tr id="iaModalThead"></tr></thead>
+        <tbody id="iaModalBody"></tbody>
+      </table>
+    </div>
+    <button class="ia-modal-close" onclick="cerrarModalIA()">✖ Cerrar</button>
+  </div>
+</div>
+<script>
+// ============================================================
+// VARIABLES GLOBALES
+// ============================================================
+let rawRows = [];
+let masterDataCompleto = [];
+let masterData = [];
+let filtrosPanel = { ciclo:[], mes:[], estadoCuenta:[] };
+let chartAgenteTCInst, chartAgenteCanalInst, chartAgenteGestionDiariaInst, chartAgenteRecuperoDiarioInst;
+let _iaUltimosGrupos = {};
+// ============================================================
+// AUTOCARGA AUTOMÁTICA AL ABRIR
+// ============================================================
+window.addEventListener('load', function(){
+  const nombreExcel = 'maf_2_v5.xlsx';
+  fetch(nombreExcel)
+    .then(r => {
+      if(!r.ok) throw new Error('No encontrado');
+      return r.arrayBuffer();
+    })
+    .then(buffer => {
+      const data = new Uint8Array(buffer);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      rawRows = XLSX.utils.sheet_to_json(sheet, {defval:''});
+      document.getElementById('fileInfo').innerText =
+        '✅ ' + nombreExcel + ' — ' + rawRows.length.toLocaleString('es-PE') + ' registros.';
+      construirDatasetMaestro(() => {
+        inicializarFiltros();
+        mostrarToast('✅ Datos cargados automáticamente','ok');
+      });
+    })                      
+    .catch(() => {
+      document.getElementById('fileInfo').innerText =
+        'Ningún archivo cargado. Haz clic en "Actualizar Datos" para comenzar.';
+    });
+});
+
+const _cacheValoresUnicos = {};
+function valoresUnicos(campo){
+  if(_cacheValoresUnicos[campo]) return _cacheValoresUnicos[campo];
+  const r=[...new Set(masterDataCompleto.map(r=>r[campo]).filter(v=>v!==''&&v!==null&&v!==undefined))];
+  _cacheValoresUnicos[campo]=r; return r;
+}
+function limpiarCacheValoresUnicos(){ Object.keys(_cacheValoresUnicos).forEach(k=>delete _cacheValoresUnicos[k]); }
+
+function mostrarToast(msg,tipo='ok',ms=3000){
+  const t=document.getElementById('toastMsg');
+  t.innerText=msg; t.className=`toast toast-${tipo} show`;
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+function toNumber(v){ if(v===undefined||v===null||v==='') return 0; if(typeof v==='number') return isNaN(v)?0:v; const n=parseFloat(v.toString().replace(/[^0-9.\-]/g,'')); return isNaN(n)?0:n; }
+function resolverColumna(fila,...candidatos){ for(const c of candidatos){ if(fila[c]!==undefined&&fila[c]!==null&&fila[c]!=='') return fila[c]; } const keys=Object.keys(fila); for(const c of candidatos){ const target=c.toString().toLowerCase().replace(/[_\s]/g,''); const found=keys.find(k=>k.toLowerCase().replace(/[_\s]/g,'')===target); if(found&&fila[found]!==undefined&&fila[found]!==null&&fila[found]!=='') return fila[found]; } return ''; }
+function parsearFecha(valor){ if(!valor) return null; if(valor instanceof Date) return isNaN(valor.getTime())?null:valor; if(typeof valor==='number'){ const utc=XLSX.SSF.parse_date_code(valor); if(!utc) return null; return new Date(utc.y,utc.m-1,utc.d); } const str=valor.toString().trim(); let m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/); if(m) return new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1])); m=str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/); if(m) return new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3])); const d=new Date(str); return isNaN(d.getTime())?null:d; }
+function calcularDiasVencimiento(fechaVcto){ if(!fechaVcto) return null; const hoy=new Date(); hoy.setHours(0,0,0,0); const vcto=new Date(fechaVcto); vcto.setHours(0,0,0,0); return Math.round((hoy-vcto)/(1000*60*60*24)); }
+function limpiarCiclo(v){ return v.toString().trim().replace(/\.0$/,''); }
+function normalizarCanalDetalle(v){ const s=v.toString().trim().toUpperCase(); if(s.includes('WHATS')) return 'WHATSAPP'; if(s.includes('SMS')) return 'SMS'; if(s.includes('IVR')) return 'IVR'; if(s.includes('MAIL')) return 'EMAIL'; if(s.includes('CALL')||s.includes('LLAM')||s.includes('TEL')) return 'LLAMADA'; return s||'SIN CANAL'; }
+function formatoMoneda(v){ return '$ '+Math.round(v).toLocaleString('es-PE'); }
+function formatoMonedaCorto(v){
+  if(v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
+  if(v >= 1000)    return '$' + (v/1000).toFixed(2) + 'K';
+  return '$' + v.toFixed(2);
+}
+function formatoFechaCorta(fechaISO){ const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic']; const p=fechaISO.split('-'); if(p.length!==3) return fechaISO; return parseInt(p[2],10)+' '+(meses[parseInt(p[1],10)-1]||''); }
+function badgeSBS(sbs){ const s=(sbs||'').toUpperCase(); if(s==='NORMAL') return `<span class="sbs-normal">${sbs}</span>`; if(s==='CPP') return `<span class="sbs-cpp">${sbs}</span>`; if(s==='DEFICIENTE') return `<span class="sbs-deficiente">${sbs}</span>`; if(s==='DUDOSO') return `<span class="sbs-dudoso">${sbs}</span>`; if(s==='PERDIDA') return `<span class="sbs-perdida">${sbs}</span>`; return sbs||'—'; }
+function fmtFecha(f){ try{ return f?f.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}):'—'; }catch(e){ return '—'; } }
+function esDeudorUnico(v){ const s=String(v).trim(); return s==='1'||s.toUpperCase()==='SI'||s.toUpperCase()==='TRUE'; }
+
+// ============================================================
+// CARGA DE ARCHIVO
+// ============================================================
+document.getElementById('fileInput').addEventListener('change',function(e){
+  const file=e.target.files[0]; if(!file) return;
+  document.getElementById('fileInfo').innerText='⏳ Procesando: '+file.name+'...';
+  const reader=new FileReader();
+  reader.onload=function(evt){
+    try{
+      const data=new Uint8Array(evt.target.result);
+      const wb=XLSX.read(data,{type:'array',cellDates:true});
+      const sheet=wb.Sheets[wb.SheetNames[0]];
+      rawRows=XLSX.utils.sheet_to_json(sheet,{defval:''});
+      document.getElementById('fileInfo').innerText='✅ '+file.name+' — '+rawRows.length.toLocaleString('es-PE')+' registros.';
+construirDatasetMaestro(() => {
+  inicializarFiltros();
+  renderMiPanel();
+  mostrarToast('✅ Archivo cargado correctamente','ok');
+});
+
+    }catch(err){
+      document.getElementById('fileInfo').innerText='❌ Error: '+err.message;
+      mostrarToast('❌ Error al procesar el archivo','err');
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// ============================================================
+// DATASET MAESTRO
+// ============================================================
+function construirDatasetMaestro(callbackFin){
+  limpiarCacheValoresUnicos();
+  masterDataCompleto = [];
+  masterData = [];
+
+  const LOTE = 2000; // procesa 2000 filas por vez
+  let idx = 0;
+  const total = rawRows.length;
+
+  // Actualizar barra de progreso en fileInfo
+  function actualizarProgreso(){
+    const pct = Math.round(idx / total * 100);
+    document.getElementById('fileInfo').innerText =
+      `⏳ Procesando datos... ${pct}% (${idx.toLocaleString('es-PE')} / ${total.toLocaleString('es-PE')} registros)`;
+  }
+
+  function procesarLote(){
+    const fin = Math.min(idx + LOTE, total);
+
+    for(let i = idx; i < fin; i++){
+      const f = rawRows[i];
+      const agenteRaw = resolverColumna(f,'AGENTE_ASIG','AGENTE','ASESOR','NOMBRE_AGENTE','AGENTE_ASIGNADO').toString().trim();
+      const gestCall  = toNumber(resolverColumna(f,'CANT_GEST_CALL','GEST_CALL','GESTIONES_CALL'));
+      const gestIVR   = toNumber(resolverColumna(f,'CANT_GEST_IVR','GEST_IVR'));
+      const gestEmail = toNumber(resolverColumna(f,'CANT_GEST_EMAIL','GEST_EMAIL'));
+      const gestSMS   = toNumber(resolverColumna(f,'CANT_GEST_SMS','GEST_SMS'));
+      const gest      = gestCall;
+      const mejorDesRptaCampNP1   = resolverColumna(f,'MEJOR_DES_RPTA_CAMP__NP1','MEJOR_DES_RPTA_CAMP_NP1').toString().trim();
+      const tuvoVisitaCampo       = mejorDesRptaCampNP1 !== '';
+      const mejorResultadoCampo   = resolverColumna(f,'MEJOR_RESULTADO_CAMP').toString().trim().toUpperCase();
+      const fechaVencimiento      = parsearFecha(resolverColumna(f,'FECHA_VCTO_PROX_CUOTA','FECHA_VENCIMIENTO','FECHA_VCTO','FEC_VCTO'));
+      const diasVencimiento       = calcularDiasVencimiento(fechaVencimiento);
+      const np1                   = resolverColumna(f,'ULT_DES_RPTA_NP1','DES_RPTA_NP1','MOTIVO_NP1').toString().trim();
+      const obs                   = resolverColumna(f,'ULT_OBSERVACION','OBSERVACION','OBS').toString().trim();
+      const ultimoMotivo          = np1 || obs || 'Sin información';
+      const contacCall            = toNumber(resolverColumna(f,'CANT_CONTAC_CALL','CONTAC_CALL','CONTACTOS'));
+      const contactoCampoEfectivo = ['CONTACTO','PROMESA','YA PAGO'].includes(mejorResultadoCampo);
+      const respp                 = resolverColumna(f,'RESPP','RESULTADO_PAGO','RES_PP','RESULTADO').toString().trim().toUpperCase();
+
+      masterDataCompleto.push({
+        idOperacion:       resolverColumna(f,'OPERACION','NRO_OPERACION','ID_OPERACION').toString().trim(),
+        codigoCliente:     resolverColumna(f,'CODIGO_CLIENTE','COD_CLIENTE','ID_CLIENTE').toString().trim(),
+        ciclo:             limpiarCiclo(resolverColumna(f,'CICLO','NRO_CICLO','CICLO_COBRO')||''),
+        mes: resolverColumna(f,'MES','PERIODO','MES_GESTION').toString().trim().toUpperCase(),
+        tramo:             resolverColumna(f,'TRAMO','TRAMO_MORA','BUCKET').toString().trim(),
+        cliente:           resolverColumna(f,'CLIENTE','NOMBRE_CLIENTE','RAZON_SOCIAL').toString().trim(),
+        nroCuota:          resolverColumna(f,'NRO_CUOTA','NUMERO_CUOTA','CUOTA_NRO').toString().trim(),
+        mejorTipoContacto: resolverColumna(f,'MEJOR_TIPO_CONTACTO','TIPO_CONTACTO').toString().trim(),
+        mejorFecCompromiso:      parsearFecha(resolverColumna(f,'MEJOR_FEC_COMPROMISO')),
+        mejorTelefonoContacto:   resolverColumna(f,'MEJOR_TELEFONO_CONTACTO').toString().trim(),
+        ultTelefonoContacto:     resolverColumna(f,'ULT_TELEFONO_CONTACTO').toString().trim(),
+        estado:            resolverColumna(f,'ESTADO','ESTADO_CUENTA','ESTADO_REGISTRO').toString().trim().toUpperCase(),
+        agente:            agenteRaw,
+        agenteSinAsignar:  agenteRaw.startsWith('0')||agenteRaw.toUpperCase().includes('SIN_ASIGNAR')||agenteRaw.toUpperCase().includes('SIN ASIGNAR')||agenteRaw==='',
+        q:                 toNumber(resolverColumna(f,'Q','CANTIDAD','CANT_CUENTAS')),
+        gest, gestCall, gestIVR, gestEmail, gestSMS,
+        contac:            contacCall,
+        promesa:           toNumber(resolverColumna(f,'CANT_PROMESA_CALL','PROMESAS','CANT_PROMESAS')),
+        respp,
+        tipoCuota:         resolverColumna(f,'TIPO_CUOTA','TIPO_CREDITO','PRODUCTO').toString().trim().toUpperCase(),
+        cuota:             toNumber(resolverColumna(f,'CUOTA_DOLARIZADA','CUOTA_USD','MONTO_CUOTA','CUOTA')),
+        pago:              toNumber(resolverColumna(f,'MONTO_PAGO_DOLARIZADO','MONTO_PAGO','PAGO_USD','PAGO')),
+        fechaGestionCallCenter: parsearFecha(resolverColumna(f,'FECHA_GESTION','FEC_GESTION')),
+        fechaPago:         parsearFecha(resolverColumna(f,'FECHA_PAGO','FEC_PAGO','FECHA_ULTIMO_PAGO')),
+        ultTipoGestion:    normalizarCanalDetalle(resolverColumna(f,'ULT_TIPO_GESTION','TIPO_GESTION','CANAL')),
+        fechaVencimiento, diasVencimiento,
+        ultimoEstadoGestion: resolverColumna(f,'ULT_DES_RPTA_NP0','DES_RPTA_NP0','ESTADO_GESTION').toString().trim()||'Sin información',
+        ultimoMotivo,
+        ultimaObservacion:   obs||'Sin observación registrada',
+        calificacionSBS:     resolverColumna(f,'CALIFICACION_SBS','CALIF_SBS','SBS','CLASIFICACION_SBS').toString().trim()||'Normal',
+        tuvoVisitaCampo,
+        mejorDesRptaCampNP1,
+        mejorResultadoCampo,
+        contactoCampoEfectivo,
+        agenteCampo:       resolverColumna(f,'MEJOR_AGENTE_CAMP','AGENTE_CAMPO').toString().trim(),
+        tuvoContactoEfectivoGeneral: (contacCall>0)||contactoCampoEfectivo,
+        deudorUnico:       esDeudorUnico(resolverColumna(f,'DEUDOR_UNICO','DEUDOR UNICO'))
+      });
+    }
+
+    idx = fin;
+    actualizarProgreso();
+
+    if(idx < total){
+      // Cede el hilo al navegador antes del siguiente lote
+      setTimeout(procesarLote, 0);
+    } else {
+      // ✅ Terminó — continuar con el flujo normal
+      masterData = [...masterDataCompleto];
+      if(typeof callbackFin === 'function') callbackFin();
+    }
+  }
+
+  actualizarProgreso();
+  setTimeout(procesarLote, 0); // arranca el primer lote
+}
+
+// ============================================================
+// MULTISELECT ENGINE
+// ============================================================
+const REGISTRO_MULTISELECT={};
+const ORDEN_MESES={ENE:1,FEB:2,MAR:3,ABR:4,MAY:5,JUN:6,JUL:7,AGO:8,SET:9,SEP:9,OCT:10,NOV:11,DIC:12};
+
+function ordenarOpciones(campo,opciones){ if(campo==='mes') return [...opciones].sort((a,b)=>(ORDEN_MESES[a.toString().trim().toUpperCase()]??99)-(ORDEN_MESES[b.toString().trim().toUpperCase()]??99)); return [...opciones].sort(); }
+function inicializarMultiselect(id,opciones,filtroObjRef,campoFiltro,callbackRender){ REGISTRO_MULTISELECT[id]={opciones:ordenarOpciones(campoFiltro,opciones),filtroObjRef,campoFiltro,callbackRender}; renderOpcionesMultiselect(id); }
+function renderOpcionesMultiselect(id,filtroTexto=''){ const reg=REGISTRO_MULTISELECT[id]; if(!reg) return; const cont=document.getElementById(id+'_options'); if(!cont) return; const sel=reg.filtroObjRef[reg.campoFiltro]; const ops=reg.opciones.filter(o=>o.toString().toLowerCase().includes(filtroTexto.toLowerCase())); if(ops.length===0){ cont.innerHTML='<div class="ms-empty">Sin resultados</div>'; return; } cont.innerHTML=ops.map(op=>{ const checked=sel.includes(op)?'checked':''; const sid=id+'_opt_'+op.toString().replace(/[^a-zA-Z0-9]/g,'_'); return `<label class="ms-option" for="${sid}"><input type="checkbox" id="${sid}" value="${op}" ${checked} onchange="toggleOpcionMultiselect('${id}','${op}',this.checked)"> ${op}</label>`; }).join(''); const chkAll=document.getElementById(id+'_all'); if(chkAll) chkAll.checked=reg.opciones.length>0&&sel.length===reg.opciones.length; }
+function toggleOpcionMultiselect(id,valor,marcado){ const reg=REGISTRO_MULTISELECT[id]; const arr=reg.filtroObjRef[reg.campoFiltro]; if(marcado){ if(!arr.includes(valor)) arr.push(valor); } else { const idx=arr.indexOf(valor); if(idx>-1) arr.splice(idx,1); } actualizarLabelMultiselect(id); reg.callbackRender(); }
+function toggleSeleccionarTodoMultiselect(id){ const reg=REGISTRO_MULTISELECT[id]; const chkAll=document.getElementById(id+'_all'); reg.filtroObjRef[reg.campoFiltro]=chkAll.checked?[...reg.opciones]:[]; renderOpcionesMultiselect(id); actualizarLabelMultiselect(id); reg.callbackRender(); }
+function actualizarLabelMultiselect(id){ const reg=REGISTRO_MULTISELECT[id]; if(!reg) return; const arr=reg.filtroObjRef[reg.campoFiltro]; const label=document.getElementById(id+'_label'); if(!label) return; if(arr.length===0||arr.length===reg.opciones.length){ label.innerText='Todos'+(id.includes('Ciclo')?' los Ciclos':id.includes('Mes')?' los Meses':id.includes('Estado')?' los Estados':''); } else if(arr.length<=2){ label.innerText=arr.join(', '); } else { label.innerText=arr.length+' seleccionados'; } }
+function toggleMultiselect(id){ document.querySelectorAll('.multiselect-panel.open').forEach(p=>{ if(p.id!==id+'_panel') p.classList.remove('open'); }); document.getElementById(id+'_panel').classList.toggle('open'); }
+function filtrarOpcionesMultiselect(id,texto){ renderOpcionesMultiselect(id,texto); }
+document.addEventListener('click',function(e){ if(!e.target.closest('.multiselect')) document.querySelectorAll('.multiselect-panel.open').forEach(p=>p.classList.remove('open')); });
+
+// ============================================================
+// INICIALIZACIÓN DE FILTROS
+// ============================================================
+function inicializarFiltros(){
+  const ciclos  = valoresUnicos('ciclo');
+  const meses = valoresUnicos('mes').map(v => v.toString().trim().toUpperCase());
+  const estados = valoresUnicos('estado')
+    .filter(v => v !== '' && v !== null && v !== undefined)
+    .map(v => v.toString().trim().toUpperCase());
+
+  const agentes = valoresUnicos('agente').filter(a => a !== '');
+
+  filtrosPanel = {
+    ciclo:        [...ciclos],
+    mes:          [...meses],
+    estadoCuenta: [...estados]
+  };
+
+  const sel = document.getElementById('selectorAgentePanel');
+  sel.innerHTML = '<option value="">— Selecciona un agente —</option>'
+    + agentes.sort().map(a => `<option value="${a}">${a}</option>`).join('');
+
+  inicializarMultiselect('msCicloPanel',   ciclos,   filtrosPanel, 'ciclo',        () => renderMiPanel());
+  inicializarMultiselect('msMesPanel',     meses,    filtrosPanel, 'mes',          () => renderMiPanel());
+  inicializarMultiselect('msEstadoPanel',  estados,  filtrosPanel, 'estadoCuenta', () => renderMiPanel());
+}
+function resetFiltrosPanel(){
+  if(!masterDataCompleto.length) return;
+
+  filtrosPanel.ciclo = valoresUnicos('ciclo');
+  filtrosPanel.mes = valoresUnicos('mes').map(v => v.toString().trim().toUpperCase());
+  filtrosPanel.estadoCuenta = valoresUnicos('estado')
+    .filter(v => v !== '')
+    .map(v => v.toString().trim().toUpperCase());
+
+  ['msCicloPanel','msMesPanel','msEstadoPanel'].forEach(id => {
+    renderOpcionesMultiselect(id);
+    actualizarLabelMultiselect(id);
+  });
+  renderMiPanel();
+  mostrarToast('🔄 Filtros restablecidos','ok');
+}
+// ============================================================
+// FILTRADO DE DATOS DEL PANEL
+// ============================================================
+function datosFiltradosPanel(){
+  const agente = document.getElementById('selectorAgentePanel')?.value || '';
+  if(!agente) return [];
+
+  // ── Paso 1: registros base del agente ──────────────────
+  const baseAgente = masterDataCompleto.filter(r => r.agente === agente);
+
+  // ── Paso 2: conjuntos disponibles SOLO para este agente ─
+  const ciclosDelAgente = [...new Set(baseAgente.map(r => r.ciclo))];
+  const mesesDelAgente  = [...new Set(baseAgente.map(r => r.mes))];
+
+  // ── Paso 3: aplicar filtros seleccionados ──────────────
+  // Si el array del filtro está vacío o tiene todos → no filtrar (mostrar todos)
+  const regCiclo = REGISTRO_MULTISELECT['msCicloPanel'];
+  const regMes   = REGISTRO_MULTISELECT['msMesPanel'];
+
+  const todosCiclosSeleccionados = !regCiclo ||
+    filtrosPanel.ciclo.length === 0 ||
+    filtrosPanel.ciclo.length === regCiclo.opciones.length;
+
+  const todosMesesSeleccionados = !regMes ||
+    filtrosPanel.mes.length === 0 ||
+    filtrosPanel.mes.length === regMes.opciones.length;
+
+  const setCiclos = new Set(
+    todosCiclosSeleccionados
+      ? ciclosDelAgente
+      : filtrosPanel.ciclo.filter(c => ciclosDelAgente.includes(c))
+  );
+
+  const setMeses = new Set(
+    todosMesesSeleccionados
+      ? mesesDelAgente
+      : filtrosPanel.mes
+          .map(m => m.toString().trim().toUpperCase())
+          .filter(m => mesesDelAgente.includes(m))
+  );
+
+  // ── Paso 4: filtro de estados ──────────────────────────
+  const regEstado = REGISTRO_MULTISELECT['msEstadoPanel'];
+  const todosEstadosSeleccionados = !regEstado ||
+    filtrosPanel.estadoCuenta.length === 0 ||
+    filtrosPanel.estadoCuenta.length === regEstado.opciones.length;
+
+  const setEstados = todosEstadosSeleccionados
+    ? null
+    : new Set(filtrosPanel.estadoCuenta.map(e => e.toString().trim().toUpperCase()));
+
+  // ── Paso 5: filtrar ────────────────────────────────────
+  return baseAgente.filter(r => {
+    if(!setCiclos.has(r.ciclo)) return false;
+    if(!setMeses.has(r.mes.toString().trim().toUpperCase())) return false;
+    if(setEstados && !setEstados.has(r.estado.trim().toUpperCase())) return false;
+    return true;
+  });
+}
+// ============================================================
+// HELPERS DE AGRUPACIÓN
+// ============================================================
+function agruparPorFecha(datos,campoFecha){
+  const grupos={};
+  datos.forEach(r=>{ const f=r[campoFecha]; if(!f) return; const key=f.toISOString().slice(0,10); grupos[key]=(grupos[key]||0)+1; });
+  return Object.entries(grupos).sort((a,b)=>a[0]<b[0]?-1:1);
+}
+
+// ============================================================
+// RENDER PRINCIPAL
+// ============================================================
+function renderMiPanel(){
+  const agente=document.getElementById('selectorAgentePanel')?.value||'';
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const fechaStr=hoy.toLocaleDateString('es-PE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('agenteNombreDisplay').innerText=agente||'Sin selección';
+
+  const totalCiclos=valoresUnicos('ciclo').length, totalMeses=valoresUnicos('mes').length, totalEstados=valoresUnicos('estado').length;
+  const lC=filtrosPanel.ciclo.length===0||filtrosPanel.ciclo.length===totalCiclos?'Todos los ciclos':filtrosPanel.ciclo.length+' ciclo(s)';
+  const lM=filtrosPanel.mes.length===0||filtrosPanel.mes.length===totalMeses?'Todos los meses':filtrosPanel.mes.length+' mes(es)';
+  const lE=filtrosPanel.estadoCuenta.length===0||filtrosPanel.estadoCuenta.length===totalEstados?'Todos los estados':filtrosPanel.estadoCuenta.join(', ');
+  document.getElementById('agenteFechaDisplay').innerText='📅 '+fechaStr+' | '+lC+' · '+lM+' · '+lE;
+
+    if(!agente){
+    document.getElementById('panelKPIsAgente').innerHTML=
+      '<div class="estado-msg">Selecciona un agente para ver su panel personalizado.</div>';
+    document.getElementById('panelAlertasAgente').innerHTML=
+      '<tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>';
+    document.getElementById('iaAccionesGrid').innerHTML=
+      '<div class="estado-msg" style="color:#64748b;">Selecciona un agente para generar acciones.</div>';
+    document.getElementById('iaResumenTexto').style.display='none';
+    return;
+  }
+
+  // ✅ CORRECTO: datos se declara ANTES de usarlo
+  const datos = datosFiltradosPanel();
+
+  if(datos.length===0){
+    document.getElementById('panelKPIsAgente').innerHTML=
+      '<div class="estado-msg">No hay datos para este agente con los filtros actuales.</div>';
+    document.getElementById('panelTipoCuotaCards').innerHTML=
+      '<div class="estado-msg">Sin datos.</div>';
+    document.getElementById('panelTablaDetalleTipoCuota').innerHTML=
+      '<tr><td colspan="6" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
+    document.getElementById('panelAlertasAgente').innerHTML=
+      '<tr><td colspan="14" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
+    document.getElementById('panelCanalAgente').innerHTML=
+      '<div class="estado-msg">Sin datos.</div>';
+    document.getElementById('panelMotivosNP0Agente').innerHTML=
+      '<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('panelMotivosNP1Agente').innerHTML=
+      '<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('tablaCanalesAutomatizados').innerHTML=
+      '<tr><td colspan="5" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
+    document.getElementById('iaAccionesGrid').innerHTML=
+      '<div class="estado-msg" style="color:#64748b;">Sin datos para los filtros actuales.</div>';
+    document.getElementById('iaResumenTexto').style.display='none';
+    if(chartAgenteTCInst){ chartAgenteTCInst.destroy(); chartAgenteTCInst=null; }
+    if(chartAgenteCanalInst){ chartAgenteCanalInst.destroy(); chartAgenteCanalInst=null; }
+    if(chartAgenteGestionDiariaInst){ chartAgenteGestionDiariaInst.destroy(); chartAgenteGestionDiariaInst=null; }
+    if(chartAgenteRecuperoDiarioInst){ chartAgenteRecuperoDiarioInst.destroy(); chartAgenteRecuperoDiarioInst=null; }
+    return;
+  }
+
+  // ── KPIs ────────────────────────────────────────────────
+  const totalQ=datos.length;
+  const cuentasPagadas=datos.filter(r=>r.respp==='CON PAGO').length;
+  const cuentasPorCobrar=totalQ-cuentasPagadas;
+  const deudoresUnicos=datos.filter(r=>r.deudorUnico).length;
+  const totalCuota=datos.reduce((a,r)=>a+r.cuota,0);
+  const totalPago=datos.filter(r=>r.respp==='CON PAGO').reduce((a,r)=>a+r.pago,0);
+  const totalGest=datos.reduce((a,r)=>a+r.gest,0);
+  const totalContac=datos.reduce((a,r)=>a+r.contac,0);
+  const totalPromesa=datos.reduce((a,r)=>a+r.promesa,0);
+  const conPromesa=datos.filter(r=>r.promesa>0).length;
+  const conPromesaYPago=datos.filter(r=>r.promesa>0&&r.respp==='CON PAGO').length;
+  const pctContac=totalGest>0?(totalContac/totalGest*100):0;
+  const pctAvance=totalCuota>0?(totalPago/totalCuota*100):0;
+  const pctCumplProm=conPromesa>0?(conPromesaYPago/conPromesa*100):0;
+  const intensidad=totalQ>0?(totalGest/totalQ):0;
+  const semContac=pctContac>=30?'verde':pctContac>=15?'amarillo':'rojo';
+  const semAvance=pctAvance>=25?'verde':pctAvance>=10?'amarillo':'rojo';
+  const semCumpl=pctCumplProm>=60?'verde':pctCumplProm>=30?'amarillo':'rojo';
+  const semInt=intensidad>=3?'verde':intensidad>=1.5?'amarillo':'rojo';
+  const semLabel=(s,v,suf)=>`<span class="ka-semaforo ka-sem-${s}">${s==='verde'?'✅':s==='amarillo'?'⚠️':'🔴'} ${v}${suf}</span>`;
+
+  document.getElementById('panelKPIsAgente').innerHTML=`
+    <div class="kpi-agente-grid">
+      <div class="kpi-agente-card kac-azul">
+        <div class="ka-label">Cuentas Asignadas</div><div class="ka-value">${totalQ.toLocaleString('es-PE')}</div>
+        <div class="ka-sub">Cartera total del agente</div>
+        <div class="ka-sub" style="margin-top:4px;"><span style="color:#64748b;">Deudores únicos: </span><strong style="color:#1a3a5c;">${deudoresUnicos.toLocaleString('es-PE')}</strong></div>
+      </div>
+      <div class="kpi-agente-card" style="border-top:4px solid #dc2626;">
+        <div class="ka-label" style="color:#dc2626;">Cuentas por Cobrar</div><div class="ka-value" style="color:#dc2626;">${cuentasPorCobrar.toLocaleString('es-PE')}</div>
+        <div class="ka-sub">Sin pago registrado</div>
+        <div class="ka-sub" style="margin-top:4px;"><span style="color:#64748b;">${totalQ>0?(cuentasPorCobrar/totalQ*100).toFixed(1):0}% de la cartera</span></div>
+      </div>
+      <div class="kpi-agente-card kac-teal">
+        <div class="ka-label">% Contactabilidad</div><div class="ka-value">${pctContac.toFixed(1)}%</div>
+        ${semLabel(semContac,pctContac.toFixed(1),'%')}
+      </div>
+      <div class="kpi-agente-card kac-naranja">
+        <div class="ka-label">Gestiones Totales</div><div class="ka-value">${totalGest.toLocaleString('es-PE')}</div>
+        <div class="ka-sub">Intensidad: ${intensidad.toFixed(2)} gest/cuenta</div>
+        ${semLabel(semInt,intensidad.toFixed(2),' g/c')}
+      </div>
+      <div class="kpi-agente-card kac-morado">
+        <div class="ka-label">Promesas Generadas</div><div class="ka-value">${totalPromesa.toLocaleString('es-PE')}</div>
+        <div class="ka-sub">% Cumplimiento: ${pctCumplProm.toFixed(1)}%</div>
+        ${semLabel(semCumpl,pctCumplProm.toFixed(1),'%')}
+      </div>
+      <div class="kpi-agente-card kac-verde">
+        <div class="ka-label">Monto Cobrado</div><div class="ka-value">${formatoMonedaCorto(totalPago)}</div>
+        <div class="ka-sub">de ${formatoMonedaCorto(totalCuota)} asignados</div>
+      </div>
+      <div class="kpi-agente-card kac-gold">
+        <div class="ka-label">% Avance</div><div class="ka-value">${pctAvance.toFixed(1)}%</div>
+        ${semLabel(semAvance,pctAvance.toFixed(1),'%')}
+      </div>
+    </div>`;
+
+  // ── Tipo de Cuota Cards ──────────────────────────────────
+  const coloresTCCard=['tc-card-normal','tc-card-balon','tc-card-bigticket','tc-card-taxi','tc-card-top','tc-card-otro'];
+  const gruposTC={};
+  datos.forEach(r=>{ const t=r.tipoCuota||'SIN ESPECIFICAR'; if(!gruposTC[t]) gruposTC[t]={q:0,conPago:0,cuota:0,pago:0}; gruposTC[t].q++; gruposTC[t].cuota+=r.cuota; if(r.respp==='CON PAGO'){gruposTC[t].conPago++;gruposTC[t].pago+=r.pago;} });
+  const entradasTC=Object.entries(gruposTC).sort((a,b)=>b[1].cuota-a[1].cuota);
+  document.getElementById('panelTipoCuotaCards').innerHTML='<div class="tipo-cuota-cards">'+entradasTC.map(([tipo,g],i)=>{
+    const ef=g.q>0?(g.conPago/g.q*100):0;
+    return `<div class="tc-card ${coloresTCCard[i%coloresTCCard.length]}"><div class="tc-tipo">${tipo}</div><div class="tc-q">${g.q}</div><div class="tc-ef">Ef: ${ef.toFixed(1)}%</div><div class="tc-monto">${formatoMonedaCorto(g.cuota)}</div></div>`;
+  }).join('')+'</div>';
+
+  // ── Tabla detalle tipo cuota ─────────────────────────────
+  const tbodyTC=document.getElementById('panelTablaDetalleTipoCuota');
+  if(entradasTC.length===0){ tbodyTC.innerHTML='<tr><td colspan="6" class="estado-msg">Sin datos.</td></tr>'; }
+  else{
+    const tot={q:0,conPago:0,sinPago:0,cuota:0};
+    let htmlTC=entradasTC.map(([tipo,g])=>{
+      const sp=g.q-g.conPago; const ef=g.q>0?(g.conPago/g.q*100):0;
+      tot.q+=g.q; tot.conPago+=g.conPago; tot.sinPago+=sp; tot.cuota+=g.cuota;
+      return `<tr><td>${tipo}</td><td>${g.q}</td><td>${g.conPago}</td><td>${sp}</td><td>${formatoMoneda(g.cuota)}</td><td>${ef.toFixed(1)}%</td></tr>`;
+    }).join('');
+    htmlTC+=`<tr class="fila-total-general"><td>TOTAL</td><td>${tot.q}</td><td>${tot.conPago}</td><td>${tot.sinPago}</td><td>${formatoMoneda(tot.cuota)}</td><td>${tot.q>0?(tot.conPago/tot.q*100).toFixed(1):0}%</td></tr>`;
+    tbodyTC.innerHTML=htmlTC;
+  }
+
+  // ── Canal del agente ─────────────────────────────────────
+  const canalesAgente={};
+  ['LLAMADA','WHATSAPP','SMS','IVR','EMAIL'].forEach(canal=>{
+    const base=datos.filter(r=>r.ultTipoGestion===canal);
+    if(base.length===0) return;
+    const contactos=base.filter(r=>r.contac>0).length;
+    const promesas=canal==='LLAMADA'?base.filter(r=>r.promesa>0).length:null;
+    const pagos=base.filter(r=>r.respp==='CON PAGO').length;
+    canalesAgente[canal]={gest:base.length,contactos,pctContac:base.length>0?(contactos/base.length*100):0,promesas,pagos};
+  });
+  const filasCanal=Object.entries(canalesAgente).sort((a,b)=>b[1].gest-a[1].gest);
+  document.getElementById('panelCanalAgente').innerHTML=filasCanal.length===0
+    ?'<div class="estado-msg">Sin gestiones por canal.</div>'
+    :`<table style="min-width:280px;"><thead><tr><th>Canal</th><th>Gestiones</th><th>Contactos</th><th>% Contac.</th><th>Promesas</th><th>Pagos</th></tr></thead><tbody>`
+    +filasCanal.map(([c,g])=>`<tr><td>${c}</td><td>${g.gest}</td><td>${g.contactos}</td><td>${g.pctContac.toFixed(1)}%</td><td>${g.promesas!==null?g.promesas:'—'}</td><td>${g.pagos}</td></tr>`).join('')
+    +`</tbody></table>`;
+
+  // ── Gráfico Tipo Cuota ───────────────────────────────────
+  const ctxTC=document.getElementById('chartAgenteTC');
+  if(chartAgenteTCInst) chartAgenteTCInst.destroy();
+  if(entradasTC.length>0) chartAgenteTCInst=new Chart(ctxTC,{type:'bar',data:{labels:entradasTC.map(e=>e[0]),datasets:[{label:'Deuda',data:entradasTC.map(e=>e[1].cuota),backgroundColor:'#1a3a5c'},{label:'Cobrado',data:entradasTC.map(e=>e[1].pago),backgroundColor:'#0d9488'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:v=>formatoMonedaCorto(v)}}},plugins:{datalabels:{display:true,anchor:'end',align:'top',color:'#334155',font:{weight:'bold',size:9},formatter:v=>v>0?formatoMonedaCorto(v):''}}}});
+
+  // ── Gráfico Canal ────────────────────────────────────────
+  const ctxCanal=document.getElementById('chartAgenteCanal');
+  if(chartAgenteCanalInst) chartAgenteCanalInst.destroy();
+  if(filasCanal.length>0) chartAgenteCanalInst=new Chart(ctxCanal,{type:'bar',data:{labels:filasCanal.map(e=>e[0]),datasets:[{label:'Gestiones',data:filasCanal.map(e=>e[1].gest),backgroundColor:'#2563eb'},{label:'Contactos',data:filasCanal.map(e=>e[1].contactos),backgroundColor:'#0d9488'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}},plugins:{datalabels:{display:true,anchor:'end',align:'top',color:'#334155',font:{weight:'bold',size:9},formatter:v=>v>0?v:''}}}});
+
+  // ── Gráfico Gestiones Diarias ────────────────────────────
+  const serieGest=agruparPorFecha(datos,'fechaGestionCallCenter');
+  const ctxGD=document.getElementById('chartAgenteGestionDiaria');
+  if(chartAgenteGestionDiariaInst) chartAgenteGestionDiariaInst.destroy();
+  if(serieGest.length>0) chartAgenteGestionDiariaInst=new Chart(ctxGD,{type:'bar',data:{labels:serieGest.map(s=>s[0]),datasets:[{label:'Gestiones',data:serieGest.map(s=>s[1]),backgroundColor:'#c2410c',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{ticks:{maxTicksLimit:8,autoSkip:true,callback:function(v){return formatoFechaCorta(this.getLabelForValue(v));}}}}}});
+
+  // ── Gráfico Recupero Diario ──────────────────────────────
+  const pagosAgente=datos.filter(r=>r.respp==='CON PAGO'&&r.fechaPago);
+  const gruposPago={};
+  pagosAgente.forEach(r=>{ const k=r.fechaPago.toISOString().slice(0,10); gruposPago[k]=(gruposPago[k]||0)+r.pago; });
+  const seriePago=Object.entries(gruposPago).sort((a,b)=>a[0]<b[0]?-1:1);
+  let acum=0; const acumSerie=seriePago.map(s=>{acum+=s[1];return acum;});
+  const ctxRD=document.getElementById('chartAgenteRecuperoDiario');
+  if(chartAgenteRecuperoDiarioInst) chartAgenteRecuperoDiarioInst.destroy();
+  if(seriePago.length>0) chartAgenteRecuperoDiarioInst=new Chart(ctxRD,{type:'bar',data:{labels:seriePago.map(s=>s[0]),datasets:[{type:'bar',label:'Recupero Diario',data:seriePago.map(s=>s[1]),backgroundColor:'#15803d',yAxisID:'y'},{type:'line',label:'Acumulado',data:acumSerie,borderColor:'#c2410c',backgroundColor:'transparent',yAxisID:'y1',tension:0.2}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,position:'left',ticks:{callback:v=>formatoMonedaCorto(v)}},y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>formatoMonedaCorto(v)}},x:{ticks:{maxTicksLimit:8,autoSkip:true,callback:function(v){return formatoFechaCorta(this.getLabelForValue(v));}}}},plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}}}});
+
+  // ── Alertas Prioritarias ─────────────────────────────────
+  const pesoSBS={NORMAL:1,CPP:2,DEFICIENTE:3,DUDOSO:4,PERDIDA:5};
+  const alertas=datos.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0)
+    .map(r=>({...r,score:(pesoSBS[(r.calificacionSBS||'').toUpperCase()]||1)*(Math.abs(r.diasVencimiento||0)+1)*r.cuota}))
+    .sort((a,b)=>b.score-a.score).slice(0,30);
+
+  const statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
+
+  document.getElementById('panelAlertasAgente').innerHTML=alertas.length===0
+    ?'<tr><td colspan="14" class="estado-msg">🎉 Sin cuentas críticas pendientes.</td></tr>'
+    :alertas.map((r,i)=>`<tr class="${r.diasVencimiento>60?'fila-urgente':r.diasVencimiento>30?'fila-atencion':''}">
+      <td>${i+1}</td>
+      <td><strong>${r.cliente}</strong></td>
+      <td style="font-size:11px;color:var(--slate-soft);">${r.ciclo}</td>
+      <td>${r.tramo}</td>
+      <td><strong>${formatoMoneda(r.cuota)}</strong></td>
+      <td><strong>${r.diasVencimiento??'—'}</strong></td>
+      <td>${badgeSBS(r.calificacionSBS)}</td>
+      <td>${Math.round(r.score).toLocaleString('es-PE')}</td>
+      <td>${r.gest}</td>
+      <td>${r.mejorTipoContacto||'—'}</td>
+      <td>${r.ultimoEstadoGestion}</td>
+      <td>${r.ultimoMotivo}</td>
+      <td>${fmtFecha(r.fechaGestionCallCenter)}</td>
+      <td>${accionSugerida(r,statsAgente)}</td>
+    </tr>`).join('');
+
+  // ── Motivos NP0 / NP1 ───────────────────────────────────
+  const sinPagoM=datos.filter(r=>r.respp!=='CON PAGO'), totalSP=sinPagoM.length;
+  const gNP0={},gNP1={};
+  sinPagoM.forEach(r=>{ gNP0[r.ultimoEstadoGestion]=(gNP0[r.ultimoEstadoGestion]||0)+1; gNP1[r.ultimoMotivo]=(gNP1[r.ultimoMotivo]||0)+1; });
+  const renderMotivos=(obj,tbodyId)=>{
+    const arr=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    document.getElementById(tbodyId).innerHTML=arr.length===0
+      ?'<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>'
+      :arr.map(([n,c],i)=>`<tr><td>${i+1}</td><td>${n}</td><td>${c}</td><td>${totalSP>0?(c/totalSP*100).toFixed(1):0}%</td></tr>`).join('');
+  };
+  renderMotivos(gNP0,'panelMotivosNP0Agente');
+  renderMotivos(gNP1,'panelMotivosNP1Agente');
+
+  // ── Canales Automatizados ────────────────────────────────
+  renderCanalesAutomatizados(datos);
+
+  // ── Motor IA ─────────────────────────────────────────────
+  generarAccionesIA(datos);
+
+}
+
+// ============================================================
+// MOTOR IA
+// ============================================================
+function generarAccionesIA(datos){
+  const grid=document.getElementById('iaAccionesGrid');
+  const resumen=document.getElementById('iaResumenTexto');
+  if(!datos||datos.length===0){ grid.innerHTML='<div class="estado-msg" style="color:#64748b;">Sin datos para analizar.</div>'; resumen.style.display='none'; return; }
+
+  const sinPago=datos.filter(r=>r.respp!=='CON PAGO');
+  const conPago=datos.filter(r=>r.respp==='CON PAGO');
+  const pesoSBS={NORMAL:1,CPP:2,DEFICIENTE:3,DUDOSO:4,PERDIDA:5};
+
+  const urgentes=sinPago
+    .filter(r=>!r.tuvoContactoEfectivoGeneral&&(r.diasVencimiento||0)>30&&r.cuota>0)
+    .map(r=>({...r,score:(pesoSBS[(r.calificacionSBS||'').toUpperCase()]||1)*(r.diasVencimiento+1)*r.cuota}))
+    .sort((a,b)=>b.score-a.score).slice(0,20);
+
+  const promesasPendientes=sinPago
+    .filter(r=>r.promesa>0&&r.mejorFecCompromiso)
+    .sort((a,b)=>{ const da=a.mejorFecCompromiso||new Date(9999,0,1); const db=b.mejorFecCompromiso||new Date(9999,0,1); return da-db; }).slice(0,20);
+
+  const seguimiento=sinPago
+    .filter(r=>r.tuvoContactoEfectivoGeneral&&r.promesa===0)
+    .sort((a,b)=>b.cuota-a.cuota).slice(0,20);
+
+  const paraCampo=sinPago
+    .filter(r=>!r.tuvoVisitaCampo&&(r.diasVencimiento||0)>60&&r.cuota>0)
+    .sort((a,b)=>b.cuota-a.cuota).slice(0,20);
+
+  const riesgoSBS=sinPago
+    .filter(r=>['DUDOSO','PERDIDA'].includes((r.calificacionSBS||'').toUpperCase()))
+    .sort((a,b)=>b.cuota-a.cuota).slice(0,20);
+
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const recuperadosHoy=conPago
+    .filter(r=>r.fechaPago&&new Date(r.fechaPago).setHours(0,0,0,0)===hoy.getTime())
+    .sort((a,b)=>b.pago-a.pago).slice(0,20);
+
+  _iaUltimosGrupos={urgentes,promesasPendientes,seguimiento,paraCampo,riesgoSBS,recuperadosHoy};
+
+  const totalCuota=datos.reduce((a,r)=>a+r.cuota,0);
+  const totalPago=conPago.reduce((a,r)=>a+r.pago,0);
+  const pctAvance=totalCuota>0?(totalPago/totalCuota*100):0;
+  const cuotaUrgente=urgentes.reduce((a,r)=>a+r.cuota,0);
+  const cuotaPromesa=promesasPendientes.reduce((a,r)=>a+r.cuota,0);
+
+  const tarjetas=[];
+  if(urgentes.length>0) tarjetas.push({tipo:'urgente',tipoLabel:'🔴 URGENTE',titulo:`${urgentes.length} cuentas sin contacto — mora crítica`,desc:`Más de 30 días de mora sin contacto efectivo. Representan ${formatoMoneda(cuotaUrgente)} en riesgo inmediato.`,cuentas:`<strong>${urgentes.length}</strong> cuentas · ${formatoMoneda(cuotaUrgente)}`,grupo:'urgentes',btnClass:'ia-btn-urgente',btnLabel:'📋 Ver detalle'});
+  if(promesasPendientes.length>0) tarjetas.push({tipo:'promesa',tipoLabel:'🟢 PROMESAS',titulo:`${promesasPendientes.length} promesas activas por vencer`,desc:`Clientes que prometieron pagar. Seguimiento inmediato. Potencial: ${formatoMoneda(cuotaPromesa)}.`,cuentas:`<strong>${promesasPendientes.length}</strong> promesas · ${formatoMoneda(cuotaPromesa)}`,grupo:'promesasPendientes',btnClass:'ia-btn-verde',btnLabel:'📋 Ver promesas'});
+  if(seguimiento.length>0) tarjetas.push({tipo:'seguim',tipoLabel:'🔵 SEGUIMIENTO',titulo:`${seguimiento.length} cuentas contactadas sin promesa`,desc:`Hubo contacto pero no se obtuvo promesa. Oportunidad de re-gestión con argumento de valor.`,cuentas:`<strong>${seguimiento.length}</strong> cuentas`,grupo:'seguimiento',btnClass:'',btnLabel:'📋 Ver cuentas'});
+  if(paraCampo.length>0) tarjetas.push({tipo:'campo',tipoLabel:'🟡 CAMPO',titulo:`${paraCampo.length} cuentas candidatas a visita`,desc:`Sin visita de campo, mora > 60 días. Candidatas para gestión presencial.`,cuentas:`<strong>${paraCampo.length}</strong> cuentas · ${formatoMoneda(paraCampo.reduce((a,r)=>a+r.cuota,0))}`,grupo:'paraCampo',btnClass:'',btnLabel:'📋 Ver candidatos'});
+  if(riesgoSBS.length>0) tarjetas.push({tipo:'riesgo',tipoLabel:'🟣 RIESGO SBS',titulo:`${riesgoSBS.length} cuentas en categoría Dudoso/Pérdida`,desc:`Calificación SBS crítica. Requieren estrategia diferenciada o escalamiento legal.`,cuentas:`<strong>${riesgoSBS.length}</strong> cuentas · ${formatoMoneda(riesgoSBS.reduce((a,r)=>a+r.cuota,0))}`,grupo:'riesgoSBS',btnClass:'',btnLabel:'📋 Ver riesgo SBS'});
+  if(recuperadosHoy.length>0) tarjetas.push({tipo:'promesa',tipoLabel:'✅ LOGROS HOY',titulo:`${recuperadosHoy.length} pagos registrados hoy`,desc:`Monto recuperado hoy: ${formatoMoneda(recuperadosHoy.reduce((a,r)=>a+r.pago,0))}.`,cuentas:`<strong>${recuperadosHoy.length}</strong> pagos hoy`,grupo:'recuperadosHoy',btnClass:'ia-btn-verde',btnLabel:'📋 Ver pagos de hoy'});
+
+  if(tarjetas.length===0){ grid.innerHTML='<div class="estado-msg" style="color:#34d399;font-size:14px;">🎉 ¡Excelente! No hay alertas críticas para este agente.</div>'; resumen.style.display='none'; return; }
+
+  grid.innerHTML=tarjetas.map(t=>`
+    <div class="ia-accion-card">
+      <div class="ia-tipo ia-tipo-${t.tipo}">${t.tipoLabel}</div>
+      <div class="ia-titulo">${t.titulo}</div>
+      <div class="ia-desc">${t.desc}</div>
+      <div class="ia-cuentas">${t.cuentas}</div>
+      <button class="ia-btn ${t.btnClass}" onclick="abrirModalIA('${t.grupo}')">${t.btnLabel}</button>
+    </div>`).join('');
+
+  const tagR=(txt,tipo)=>`<span class="ia-tag ia-tag-${tipo}">${txt}</span>`;
+  resumen.style.display='block';
+  resumen.innerHTML=`
+    <b>📊 Resumen Ejecutivo del Agente</b><br><br>
+    Cartera: <b>${datos.length.toLocaleString('es-PE')}</b> cuentas ·
+    Deuda asignada: <b>${formatoMoneda(totalCuota)}</b> ·
+    Recuperado: <b>${formatoMoneda(totalPago)}</b> ·
+    Avance: ${pctAvance>=25?tagR(pctAvance.toFixed(1)+'%','verde'):pctAvance>=10?tagR(pctAvance.toFixed(1)+'%','amarillo'):tagR(pctAvance.toFixed(1)+'%','rojo')}<br><br>
+    ${urgentes.length>0?`⚡ <b>${urgentes.length}</b> cuentas urgentes sin contacto (${tagR(formatoMoneda(cuotaUrgente),'rojo')}).<br>`:''}
+    ${promesasPendientes.length>0?`🤝 <b>${promesasPendientes.length}</b> promesas activas por confirmar (${tagR(formatoMoneda(cuotaPromesa),'verde')}).<br>`:''}
+    ${seguimiento.length>0?`📞 <b>${seguimiento.length}</b> cuentas contactadas pendientes de promesa.<br>`:''}
+    ${paraCampo.length>0?`🚶 <b>${paraCampo.length}</b> candidatos para visita de campo.<br>`:''}
+    ${riesgoSBS.length>0?`⚠️ <b>${riesgoSBS.length}</b> cuentas en riesgo SBS alto (Dudoso/Pérdida).<br>`:''}
+    ${recuperadosHoy.length>0?`✅ <b>${recuperadosHoy.length}</b> pagos registrados hoy. ¡Buen trabajo!<br>`:''}`;
+}
+
+// ============================================================
+// MODAL IA
+// ============================================================
+function abrirModalIA(grupo){
+  const datos=_iaUltimosGrupos[grupo];
+  if(!datos||datos.length===0){ mostrarToast('Sin datos para mostrar','warn'); return; }
+  const titulos={urgentes:'🔴 Cuentas Urgentes — Sin Contacto y Mora Crítica',promesasPendientes:'🟢 Promesas Activas Pendientes de Pago',seguimiento:'🔵 Cuentas Contactadas Sin Promesa',paraCampo:'🟡 Candidatos a Visita de Campo',riesgoSBS:'🟣 Cuentas con Riesgo SBS Alto',recuperadosHoy:'✅ Pagos Registrados Hoy'};
+  const subs={urgentes:'Ordenadas por score de prioridad (SBS × Mora × Monto). Acción inmediata requerida.',promesasPendientes:'Ordenadas por fecha de compromiso. Contactar hoy para confirmar pago.',seguimiento:'Hubo contacto pero no se obtuvo promesa. Re-gestionar con argumento diferente.',paraCampo:'Sin visita previa, mora > 60 días. Coordinar con equipo de campo.',riesgoSBS:'Calificación SBS crítica. Evaluar escalamiento a gestión legal.',recuperadosHoy:'Pagos del día. Registrar y confirmar en sistema.'};
+  document.getElementById('iaModalTitulo').innerText=titulos[grupo]||'Detalle';
+  document.getElementById('iaModalSub').innerText=subs[grupo]||'';
+
+  const cabeceras=grupo==='recuperadosHoy'
+    ?['#','Cliente','Ciclo','Tramo','Cuota USD','Pago USD','Fecha Pago','SBS']
+    :grupo==='promesasPendientes'
+    ?['#','Cliente','Ciclo','Tramo','Cuota USD','Días Mora','SBS','Fec. Compromiso','Últ. Contacto']
+    :['#','Cliente','Ciclo','Tramo','Cuota USD','Días Mora','SBS','Score','Gestiones','Últ. Estado'];
+
+  document.getElementById('iaModalThead').innerHTML=cabeceras.map(c=>`<th>${c}</th>`).join('');
+
+  const filas=datos.map((r,i)=>{
+    if(grupo==='recuperadosHoy') return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td><b style="color:#34d399;">${formatoMoneda(r.pago)}</b></td><td>${fmtFecha(r.fechaPago)}</td><td>${badgeSBS(r.calificacionSBS)}</td></tr>`;
+    if(grupo==='promesasPendientes') return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td>${r.diasVencimiento??'—'}</td><td>${badgeSBS(r.calificacionSBS)}</td><td><b style="color:#34d399;">${fmtFecha(r.mejorFecCompromiso)}</b></td><td>${r.mejorTipoContacto||'—'}</td></tr>`;
+    const score=r.score?Math.round(r.score).toLocaleString('es-PE'):'—';
+    return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td>${r.diasVencimiento??'—'}</td><td>${badgeSBS(r.calificacionSBS)}</td><td>${score}</td><td>${r.gest}</td><td>${r.ultimoEstadoGestion}</td></tr>`;
+  }).join('');
+
+  document.getElementById('iaModalBody').innerHTML=filas||'<tr><td colspan="10" class="estado-msg">Sin registros.</td></tr>';
+  document.getElementById('iaModalOverlay').classList.add('open');
+}
+
+function cerrarModalIA(){
+  document.getElementById('iaModalOverlay').classList.remove('open');
+}
+
+// ============================================================
+// ACCIÓN SUGERIDA POR CUENTA
+// ============================================================
+function accionSugerida(r,statsAgente){
+  const sbs=(r.calificacionSBS||'').toUpperCase();
+  const dias=r.diasVencimiento||0;
+  const ultimoMotivo=(r.ultimoMotivo||'').toUpperCase();
+  const tienePromesa=r.promesa>0;
+  const contactoEfectivo=r.tuvoContactoEfectivoGeneral;
+  const tuvoCampo=r.tuvoVisitaCampo;
+  const gestiones=r.gest||0;
+
+  // 1. Promesa activa vigente → confirmar
+  if(tienePromesa&&r.mejorFecCompromiso){
+    const hoy=new Date(); hoy.setHours(0,0,0,0);
+    const fecComp=new Date(r.mejorFecCompromiso); fecComp.setHours(0,0,0,0);
+    if(fecComp>=hoy)
+      return `<span class="accion-badge accion-confirmar">✅ Confirmar promesa ${fmtFecha(r.mejorFecCompromiso)}</span>`;
+    else
+      return `<span class="accion-badge accion-llamar">📞 Promesa vencida — rellamar hoy</span>`;
+  }
+
+  // 2. SBS crítico + mora alta → legal
+  if(['DUDOSO','PERDIDA'].includes(sbs)&&dias>60)
+    return `<span class="accion-badge accion-legal">⚖️ Escalar a gestión legal</span>`;
+
+  // 3. Sin contacto + sin campo + mora alta → campo
+  if(!contactoEfectivo&&!tuvoCampo&&dias>45)
+    return `<span class="accion-badge accion-campo">🚶 Enviar a visita de campo</span>`;
+
+  // 4. Teléfono apagado/no contesta repetido → WhatsApp
+  if(['TELF NO CONTESTA','TELEF APAGADO','NO CONTESTA'].some(m=>ultimoMotivo.includes(m))&&gestiones>=5)
+    return `<span class="accion-badge accion-whatsapp">💬 Contactar por WhatsApp/SMS</span>`;
+
+  // 5. Contacto efectivo sin promesa → re-llamar
+  if(contactoEfectivo&&!tienePromesa)
+    return `<span class="accion-badge accion-promesa">🎯 Re-llamar — negociar promesa</span>`;
+
+  // 6. Sin contacto, mora moderada → llamar
+  if(!contactoEfectivo&&dias<=45)
+    return `<span class="accion-badge accion-llamar">📞 Llamar — primer contacto</span>`;
+
+  // 7. CPP/Deficiente con mora → escalar supervisor
+  if(['CPP','DEFICIENTE'].includes(sbs)&&dias>30)
+    return `<span class="accion-badge accion-escalar">⚠️ Escalar a supervisor</span>`;
+
+  return `<span class="accion-badge accion-llamar">📞 Gestionar hoy</span>`;
+}
+
+// ============================================================
+// CANALES AUTOMATIZADOS (IVR / EMAIL / SMS)
+// ============================================================
+function renderCanalesAutomatizados(datos){
+  const tbody=document.getElementById('tablaCanalesAutomatizados');
+  if(!tbody) return;
+  const canales=[
+    {nombre:'IVR',   campo:'gestIVR'  },
+    {nombre:'EMAIL', campo:'gestEmail'},
+    {nombre:'SMS',   campo:'gestSMS'  }
+  ];
+  const filas=canales.map(c=>{
+    const total   =datos.reduce((a,r)=>a+(r[c.campo]||0),0);
+    const conGest =datos.filter(r=>(r[c.campo]||0)>0).length;
+    const promedio=conGest>0?(total/conGest):0;
+    return {nombre:c.nombre,total,conGest,promedio};
+  }).filter(f=>f.total>0);
+  if(filas.length===0){
+    tbody.innerHTML='<tr><td colspan="5" class="estado-msg">Sin gestiones automatizadas registradas para este agente.</td></tr>';
+    return;
+  }
+  const totalGeneral=filas.reduce((a,f)=>a+f.total,0);
+  tbody.innerHTML=filas.map(f=>`
+    <tr>
+      <td><strong>${f.nombre}</strong></td>
+      <td>${f.total.toLocaleString('es-PE')}</td>
+      <td>${totalGeneral>0?(f.total/totalGeneral*100).toFixed(1):0}%</td>
+      <td>${f.conGest.toLocaleString('es-PE')}</td>
+      <td>${f.promedio.toFixed(1)}</td>
+    </tr>`).join('')
+  +`<tr class="fila-total-general">
+      <td>TOTAL</td>
+      <td>${totalGeneral.toLocaleString('es-PE')}</td>
+      <td>100%</td><td>—</td><td>—</td>
+    </tr>`;
+}
+
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarModalIA(); });
+
+
+</script>
+</body>
+</html>
+
