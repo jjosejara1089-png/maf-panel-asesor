@@ -47,7 +47,6 @@
   .fila-urgente { background:#fff5f5; }
   .fila-atencion { background:#fffbeb; }
   .fila-total-general { font-weight:700; background:var(--blue-light); border-top:2px solid var(--border); }
-  /* MULTISELECT */
   .multiselect { position:relative; display:inline-block; }
   .multiselect-btn { background:#fff; color:var(--slate); border:1px solid var(--border); padding:8px 12px; border-radius:8px; min-width:180px; font-size:13px; text-align:left; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; }
   .multiselect-btn:hover { background:var(--panel); }
@@ -62,14 +61,12 @@
   .ms-option:hover { background:var(--panel); }
   .ms-empty { font-size:12.5px; color:var(--slate-soft); text-align:center; padding:10px; }
   .multiselect input[type=checkbox] { accent-color:var(--blue); cursor:pointer; }
-  /* SELECTOR BANNER */
   .agente-selector-banner { background:linear-gradient(135deg,#0f4c81,#1a6bb5); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; box-shadow:0 2px 8px rgba(15,76,129,0.2); }
   .agente-selector-banner label { color:#bfdbfe; font-size:13px; font-weight:600; }
   .agente-selector-banner select { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); padding:8px 14px; border-radius:8px; font-size:14px; font-weight:700; min-width:280px; cursor:pointer; }
   .agente-selector-banner select option { background:#1a3a5c; color:#fff; }
   .agente-nombre-display { color:#fff; font-size:18px; font-weight:800; flex:1; }
   .agente-fecha-display { color:#93c5fd; font-size:12px; }
-  /* KPI AGENTE */
   .kpi-agente-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:20px; }
   .kpi-agente-card { background:var(--card); border-radius:12px; padding:16px; border:1px solid var(--border); box-shadow:0 2px 6px rgba(26,58,92,0.07); position:relative; overflow:hidden; }
   .kpi-agente-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:12px 12px 0 0; }
@@ -86,7 +83,6 @@
   .ka-sem-verde { background:var(--success-bg); color:#166534; }
   .ka-sem-amarillo { background:var(--warning-bg); color:#92400e; }
   .ka-sem-rojo { background:var(--danger-bg); color:#b91c1c; }
-  /* TIPO CUOTA CARDS */
   .tipo-cuota-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
   .tc-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; border-left:4px solid transparent; }
   .tc-card-normal { border-left-color:#2563eb; }
@@ -99,17 +95,14 @@
   .tc-card .tc-q { font-size:20px; font-weight:800; color:var(--navy); margin:4px 0 2px 0; }
   .tc-card .tc-ef { font-size:12px; color:var(--slate-soft); }
   .tc-card .tc-monto { font-size:11px; color:var(--slate-lighter); margin-top:2px; }
-  /* TABLA PRIORITARIAS */
   .tabla-prioritarias { min-width:700px; }
   .tabla-prioritarias th { font-size:11px; }
   .tabla-prioritarias td { font-size:12.5px; padding:9px 10px; }
-  /* SBS BADGES */
   .sbs-normal { background:var(--success-bg); color:#166534; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
   .sbs-cpp { background:var(--warning-bg); color:#92400e; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
   .sbs-deficiente { background:#ffedd5; color:#9a3412; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
   .sbs-dudoso { background:var(--danger-bg); color:#b91c1c; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
   .sbs-perdida { background:#4c1d95; color:#fff; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
-  /* PANEL IA */
   .ia-panel { background:linear-gradient(135deg,#0f172a,#1e3a5f); border-radius:14px; padding:20px 24px; margin-bottom:20px; color:#e2e8f0; box-shadow:0 4px 20px rgba(15,23,42,0.3); }
   .ia-panel h3 { color:#93c5fd; margin-bottom:4px; font-size:15px; }
   .ia-panel .ia-subtitle { color:#64748b; font-size:12px; margin-bottom:16px; }
@@ -138,7 +131,6 @@
   .ia-tag-rojo { background:rgba(248,113,113,0.2); color:#fca5a5; }
   .ia-tag-verde { background:rgba(52,211,153,0.2); color:#6ee7b7; }
   .ia-tag-amarillo { background:rgba(251,191,36,0.2); color:#fde68a; }
-  /* MODAL IA */
   .ia-modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
   .ia-modal-overlay.open { display:flex; }
   .ia-modal { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:24px; max-width:900px; width:95%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
@@ -151,17 +143,14 @@
   .ia-modal-body tr:hover td { background:rgba(255,255,255,0.04); }
   .ia-modal-close { background:rgba(248,113,113,0.2); border:1px solid rgba(248,113,113,0.4); color:#fca5a5; padding:8px 20px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:14px; align-self:flex-end; }
   .ia-modal-close:hover { background:rgba(248,113,113,0.4); color:#fff; }
-  /* ACCIÓN SUGERIDA BADGES */
-.accion-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
-.accion-llamar    { background:#dbeafe; color:#1d4ed8; }
-.accion-promesa   { background:#d1fae5; color:#065f46; }
-.accion-campo     { background:#fef3c7; color:#92400e; }
-.accion-legal     { background:#ede9fe; color:#5b21b6; }
-.accion-whatsapp  { background:#dcfce7; color:#166534; }
-.accion-escalar   { background:#fee2e2; color:#991b1b; }
-.accion-confirmar { background:#e0f2fe; color:#075985; }
-
-/* TOAST */
+  .accion-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
+  .accion-llamar    { background:#dbeafe; color:#1d4ed8; }
+  .accion-promesa   { background:#d1fae5; color:#065f46; }
+  .accion-campo     { background:#fef3c7; color:#92400e; }
+  .accion-legal     { background:#ede9fe; color:#5b21b6; }
+  .accion-whatsapp  { background:#dcfce7; color:#166534; }
+  .accion-escalar   { background:#fee2e2; color:#991b1b; }
+  .accion-confirmar { background:#e0f2fe; color:#075985; }
   .toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:#e2e8f0; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.4); z-index:2000; transform:translateY(80px); opacity:0; transition:all 0.3s ease; border-left:4px solid #3b82f6; }
   .toast.show { transform:translateY(0); opacity:1; }
   .toast.toast-ok { border-left-color:#34d399; }
@@ -185,7 +174,6 @@
 
 <div class="seccion">
 
-  <!-- ── Selector de agente + filtros ── -->
   <div class="agente-selector-banner">
     <div>
       <label>👤 Selecciona tu agente</label>
@@ -199,7 +187,6 @@
       <div class="agente-nombre-display" id="agenteNombreDisplay">Sin selección</div>
       <div class="agente-fecha-display" id="agenteFechaDisplay">—</div>
     </div>
-    <!-- Filtro Ciclo -->
     <div class="multiselect" id="msCicloPanel">
       <button class="multiselect-btn" onclick="toggleMultiselect('msCicloPanel')" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
         <span id="msCicloPanel_label">Todos los Ciclos</span><span class="ms-arrow" style="color:#93c5fd;">▾</span>
@@ -210,7 +197,6 @@
         <div class="ms-options" id="msCicloPanel_options"></div>
       </div>
     </div>
-    <!-- Filtro Mes -->
     <div class="multiselect" id="msMesPanel">
       <button class="multiselect-btn" onclick="toggleMultiselect('msMesPanel')" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
         <span id="msMesPanel_label">Todos los Meses</span><span class="ms-arrow" style="color:#93c5fd;">▾</span>
@@ -221,7 +207,6 @@
         <div class="ms-options" id="msMesPanel_options"></div>
       </div>
     </div>
-    <!-- Filtro Estado -->
     <div style="display:flex;flex-direction:column;gap:4px;">
       <label style="color:#bfdbfe;font-size:12px;font-weight:600;">🔔 Estado de Cuenta</label>
       <div class="multiselect" id="msEstadoPanel">
@@ -238,12 +223,10 @@
     <button class="secondary" onclick="resetFiltrosPanel()" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">🔄 Limpiar</button>
   </div>
 
-  <!-- ── KPIs ── -->
   <div id="panelKPIsAgente">
     <div class="estado-msg">Carga un archivo y selecciona un agente para ver su panel.</div>
   </div>
 
-  <!-- ── Tipo de Cuota + Canal ── -->
   <div class="grid2b" style="margin-bottom:20px;">
     <div class="panel">
       <h3>💳 Cartera por Tipo de Cuota</h3>
@@ -259,7 +242,6 @@
     </div>
   </div>
 
-  <!-- ── Gestiones diarias + Recupero ── -->
   <div class="grid2b" style="margin-bottom:20px;">
     <div class="panel">
       <h3>📅 Gestiones Call Center por Fecha</h3>
@@ -273,7 +255,6 @@
     </div>
   </div>
 
-  <!-- ── Detalle tipo cuota ── -->
   <div class="panel" style="margin-bottom:20px;">
     <h3>📋 Detalle de Cobranza por Tipo de Cuota</h3>
     <div class="subtitle">Resumen de efectividad por producto.</div>
@@ -288,61 +269,52 @@
     </table>
   </div>
 
-<!-- ── Cuentas Prioritarias ── -->
-<div style="margin-bottom:20px;">
-  <div style="background:var(--panel);border-radius:10px;border:1px solid var(--border);padding:16px;">
-    <h3>🚨 Mis Cuentas Prioritarias — Acción Inmediata</h3>
-    <div class="subtitle">Todas las cuentas sin pago ordenadas por monto de cuota USD (mayor a menor).</div>
-
-    <!-- Barra de búsqueda + contador -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
-      <input
-        type="text"
-        id="buscadorPrioritarias"
-        placeholder="🔍 Buscar cliente, ciclo, tramo, tipo cuota..."
-        oninput="filtrarTablaPrioritarias()"
-        style="flex:1;min-width:260px;padding:8px 12px;border:1px solid var(--border);
-               border-radius:8px;font-size:13px;background:#fff;color:var(--slate);"
-      >
-      <span id="contadorPrioritarias"
-        style="font-size:12px;color:var(--slate-soft);white-space:nowrap;font-weight:600;">
-      </span>
-      <button class="secondary" onclick="limpiarBuscadorPrioritarias()"
-        style="padding:7px 12px;font-size:12px;">
-        ✖ Limpiar
-      </button>
-    </div>
-
-    <div style="overflow-x:auto;overflow-y:auto;max-height:520px;width:100%;">
-        <thead>
-          <tr>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">#</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:180px;">Cliente</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Ciclo</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tramo</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cuota USD</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Días Venc.</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">SBS</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tipo Cuota</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Gestiones</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Mejor Contacto</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Estado (NP0)</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Motivo (NP1)</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Últ. Fecha Gestión</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:220px;">🤖 Acción Sugerida</th>
-          </tr>
-        </thead>
-        <tbody id="panelAlertasAgente">
-          <tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>
-        </tbody>
-      </table>
+  <!-- ── Cuentas Prioritarias ── -->
+  <div style="margin-bottom:20px;">
+    <div style="background:var(--panel);border-radius:10px;border:1px solid var(--border);padding:16px;">
+      <h3>🚨 Mis Cuentas Prioritarias — Acción Inmediata</h3>
+      <div class="subtitle">Todas las cuentas sin pago ordenadas por monto de cuota USD (mayor a menor).</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <input type="text" id="buscadorPrioritarias"
+          placeholder="🔍 Buscar cliente, ciclo, tramo, tipo cuota..."
+          oninput="filtrarTablaPrioritarias()"
+          style="flex:1;min-width:260px;padding:8px 12px;border:1px solid var(--border);
+                 border-radius:8px;font-size:13px;background:#fff;color:var(--slate);">
+        <span id="contadorPrioritarias"
+          style="font-size:12px;color:var(--slate-soft);white-space:nowrap;font-weight:600;"></span>
+        <button class="secondary" onclick="limpiarBuscadorPrioritarias()"
+          style="padding:7px 12px;font-size:12px;">✖ Limpiar</button>
+      </div>
+      <div style="overflow-x:auto;overflow-y:auto;max-height:520px;width:100%;">
+        <table class="tabla-prioritarias" style="min-width:1200px;width:100%;">
+          <thead>
+            <tr>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">#</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:180px;">Cliente</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Ciclo</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tramo</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cuota USD</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Días Venc.</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">SBS</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tipo Cuota</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Gestiones</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Mejor Contacto</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Estado (NP0)</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Motivo (NP1)</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Últ. Fecha Gestión</th>
+              <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:220px;">🤖 Acción Sugerida</th>
+            </tr>
+          </thead>
+          <tbody id="panelAlertasAgente">
+            <tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- ── Panel IA ── -->
   <div class="ia-panel" id="panelAccionesIA">
-    <h3> Gestión Inteligente de Cartera</h3>
+    <h3>🤖 Gestión Inteligente de Cartera</h3>
     <div class="ia-subtitle">Análisis automático basado en toda la cartera del agente. Se actualiza al cambiar filtros.</div>
     <div class="ia-acciones-grid" id="iaAccionesGrid">
       <div class="estado-msg" style="color:#64748b;">Selecciona un agente para generar acciones.</div>
@@ -350,7 +322,6 @@
     <div class="ia-resumen-ia" id="iaResumenTexto" style="display:none;"></div>
   </div>
 
-  <!-- ── Motivos NP0 / NP1 ── -->
   <div class="grid2b" style="margin-bottom:0;">
     <div class="panel">
       <h3>🗣️ Causas de No Pago (NP0 — Estado)</h3>
@@ -367,18 +338,15 @@
       </table>
     </div>
   </div>
-  <!-- ── Gestiones por Canal Automatizado ── -->
+
   <div class="panel" style="margin-top:20px;">
     <h3>📡 Gestiones por Canal Automatizado</h3>
     <div class="subtitle">Volumen IVR, Email y SMS — referencial, no incluido en KPI del asesor.</div>
     <table style="min-width:400px;">
       <thead>
         <tr>
-          <th>Canal</th>
-          <th>Total Gestiones</th>
-          <th>% del Total Automatizado</th>
-          <th>Cuentas con Gestión</th>
-          <th>Promedio por Cuenta</th>
+          <th>Canal</th><th>Total Gestiones</th><th>% del Total Automatizado</th>
+          <th>Cuentas con Gestión</th><th>Promedio por Cuenta</th>
         </tr>
       </thead>
       <tbody id="tablaCanalesAutomatizados">
@@ -387,9 +355,8 @@
     </table>
   </div>
 
-</div><!-- fin .seccion -->
+</div>
 
-<!-- Modal IA -->
 <div class="ia-modal-overlay" id="iaModalOverlay" onclick="if(event.target===this)cerrarModalIA()">
   <div class="ia-modal">
     <h3 id="iaModalTitulo">Detalle de Cuentas</h3>
@@ -403,6 +370,7 @@
     <button class="ia-modal-close" onclick="cerrarModalIA()">✖ Cerrar</button>
   </div>
 </div>
+
 <script>
 // ============================================================
 // VARIABLES GLOBALES
@@ -414,16 +382,14 @@ let filtrosPanel = { ciclo:[], mes:[], estadoCuenta:[] };
 let chartAgenteTCInst, chartAgenteCanalInst, chartAgenteGestionDiariaInst, chartAgenteRecuperoDiarioInst;
 let _iaUltimosGrupos = {};
 let _alertasPrioritariasCache = [];
+
 // ============================================================
-// AUTOCARGA AUTOMÁTICA AL ABRIR
+// AUTOCARGA
 // ============================================================
 window.addEventListener('load', function(){
   const nombreExcel = 'maf_2_v5.xlsx';
   fetch(nombreExcel)
-    .then(r => {
-      if(!r.ok) throw new Error('No encontrado');
-      return r.arrayBuffer();
-    })
+    .then(r => { if(!r.ok) throw new Error('No encontrado'); return r.arrayBuffer(); })
     .then(buffer => {
       const data = new Uint8Array(buffer);
       const wb = XLSX.read(data, {type:'array', cellDates:true});
@@ -435,13 +401,16 @@ window.addEventListener('load', function(){
         inicializarFiltros();
         mostrarToast('✅ Datos cargados automáticamente','ok');
       });
-    })                      
+    })
     .catch(() => {
       document.getElementById('fileInfo').innerText =
         'Ningún archivo cargado. Haz clic en "Actualizar Datos" para comenzar.';
     });
 });
 
+// ============================================================
+// CACHE VALORES ÚNICOS
+// ============================================================
 const _cacheValoresUnicos = {};
 function valoresUnicos(campo){
   if(_cacheValoresUnicos[campo]) return _cacheValoresUnicos[campo];
@@ -466,18 +435,14 @@ function calcularDiasVencimiento(fechaVcto){ if(!fechaVcto) return null; const h
 function limpiarCiclo(v){ return v.toString().trim().replace(/\.0$/,''); }
 function normalizarCanalDetalle(v){ const s=v.toString().trim().toUpperCase(); if(s.includes('WHATS')) return 'WHATSAPP'; if(s.includes('SMS')) return 'SMS'; if(s.includes('IVR')) return 'IVR'; if(s.includes('MAIL')) return 'EMAIL'; if(s.includes('CALL')||s.includes('LLAM')||s.includes('TEL')) return 'LLAMADA'; return s||'SIN CANAL'; }
 function formatoMoneda(v){ return '$ '+Math.round(v).toLocaleString('es-PE'); }
-function formatoMonedaCorto(v){
-  if(v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
-  if(v >= 1000)    return '$' + (v/1000).toFixed(2) + 'K';
-  return '$' + v.toFixed(2);
-}
+function formatoMonedaCorto(v){ if(v>=1000000) return '$'+(v/1000000).toFixed(2)+'M'; if(v>=1000) return '$'+(v/1000).toFixed(2)+'K'; return '$'+v.toFixed(2); }
 function formatoFechaCorta(fechaISO){ const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic']; const p=fechaISO.split('-'); if(p.length!==3) return fechaISO; return parseInt(p[2],10)+' '+(meses[parseInt(p[1],10)-1]||''); }
 function badgeSBS(sbs){ const s=(sbs||'').toUpperCase(); if(s==='NORMAL') return `<span class="sbs-normal">${sbs}</span>`; if(s==='CPP') return `<span class="sbs-cpp">${sbs}</span>`; if(s==='DEFICIENTE') return `<span class="sbs-deficiente">${sbs}</span>`; if(s==='DUDOSO') return `<span class="sbs-dudoso">${sbs}</span>`; if(s==='PERDIDA') return `<span class="sbs-perdida">${sbs}</span>`; return sbs||'—'; }
 function fmtFecha(f){ try{ return f?f.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}):'—'; }catch(e){ return '—'; } }
 function esDeudorUnico(v){ const s=String(v).trim(); return s==='1'||s.toUpperCase()==='SI'||s.toUpperCase()==='TRUE'; }
 
 // ============================================================
-// CARGA DE ARCHIVO
+// CARGA DE ARCHIVO MANUAL
 // ============================================================
 document.getElementById('fileInput').addEventListener('change',function(e){
   const file=e.target.files[0]; if(!file) return;
@@ -490,12 +455,11 @@ document.getElementById('fileInput').addEventListener('change',function(e){
       const sheet=wb.Sheets[wb.SheetNames[0]];
       rawRows=XLSX.utils.sheet_to_json(sheet,{defval:''});
       document.getElementById('fileInfo').innerText='✅ '+file.name+' — '+rawRows.length.toLocaleString('es-PE')+' registros.';
-construirDatasetMaestro(() => {
-  inicializarFiltros();
-  renderMiPanel();
-  mostrarToast('✅ Archivo cargado correctamente','ok');
-});
-
+      construirDatasetMaestro(() => {
+        inicializarFiltros();
+        renderMiPanel();
+        mostrarToast('✅ Archivo cargado correctamente','ok');
+      });
     }catch(err){
       document.getElementById('fileInfo').innerText='❌ Error: '+err.message;
       mostrarToast('❌ Error al procesar el archivo','err');
@@ -512,12 +476,10 @@ function construirDatasetMaestro(callbackFin){
   limpiarCacheValoresUnicos();
   masterDataCompleto = [];
   masterData = [];
-
-  const LOTE = 2000; // procesa 2000 filas por vez
+  const LOTE = 2000;
   let idx = 0;
   const total = rawRows.length;
 
-  // Actualizar barra de progreso en fileInfo
   function actualizarProgreso(){
     const pct = Math.round(idx / total * 100);
     document.getElementById('fileInfo').innerText =
@@ -526,46 +488,41 @@ function construirDatasetMaestro(callbackFin){
 
   function procesarLote(){
     const fin = Math.min(idx + LOTE, total);
-
     for(let i = idx; i < fin; i++){
       const f = rawRows[i];
-      const agenteRaw = resolverColumna(f, 'ASESOR_ASIGN', 'AGENTE_ASIG', 'AGENTE', 'ASESOR', 'NOMBRE_AGENTE', 'AGENTE_ASIGNADO').toString().trim();
+      const agenteRaw = resolverColumna(f,'ASESOR_ASIGN','AGENTE_ASIG','AGENTE','ASESOR','NOMBRE_AGENTE','AGENTE_ASIGNADO').toString().trim();
       const gestCall  = toNumber(resolverColumna(f,'CANT_GEST_CALL','GEST_CALL','GESTIONES_CALL'));
       const gestIVR   = toNumber(resolverColumna(f,'CANT_GEST_IVR','GEST_IVR'));
       const gestEmail = toNumber(resolverColumna(f,'CANT_GEST_EMAIL','GEST_EMAIL'));
       const gestSMS   = toNumber(resolverColumna(f,'CANT_GEST_SMS','GEST_SMS'));
       const gest      = gestCall;
-      const mejorDesRptaCampNP1   = resolverColumna(f,'MEJOR_DES_RPTA_CAMP__NP1','MEJOR_DES_RPTA_CAMP_NP1').toString().trim();
-      const tuvoVisitaCampo       = mejorDesRptaCampNP1 !== '';
-      const mejorResultadoCampo   = resolverColumna(f,'MEJOR_RESULTADO_CAMP').toString().trim().toUpperCase();
-      const fechaVencimiento      = parsearFecha(resolverColumna(f,'FECHA_VCTO_PROX_CUOTA','FECHA_VENCIMIENTO','FECHA_VCTO','FEC_VCTO'));
-      const diasVencimiento       = calcularDiasVencimiento(fechaVencimiento);
-      const np1                   = resolverColumna(f,'ULT_DES_RPTA_NP1','DES_RPTA_NP1','MOTIVO_NP1').toString().trim();
-      const obs                   = resolverColumna(f,'ULT_OBSERVACION','OBSERVACION','OBS').toString().trim();
-      const ultimoMotivo          = np1 || obs || 'Sin información';
-      const contacCall            = toNumber(resolverColumna(f,'CANT_CONTAC_CALL','CONTAC_CALL','CONTACTOS'));
+      const mejorDesRptaCampNP1 = resolverColumna(f,'MEJOR_DES_RPTA_CAMP__NP1','MEJOR_DES_RPTA_CAMP_NP1').toString().trim();
+      const tuvoVisitaCampo     = mejorDesRptaCampNP1 !== '';
+      const mejorResultadoCampo = resolverColumna(f,'MEJOR_RESULTADO_CAMP').toString().trim().toUpperCase();
+      const fechaVencimiento    = parsearFecha(resolverColumna(f,'FECHA_VCTO_PROX_CUOTA','FECHA_VENCIMIENTO','FECHA_VCTO','FEC_VCTO'));
+      const diasVencimiento     = calcularDiasVencimiento(fechaVencimiento);
+      const np1                 = resolverColumna(f,'ULT_DES_RPTA_NP1','DES_RPTA_NP1','MOTIVO_NP1').toString().trim();
+      const obs                 = resolverColumna(f,'ULT_OBSERVACION','OBSERVACION','OBS').toString().trim();
+      const ultimoMotivo        = np1 || obs || 'Sin información';
+      const contacCall          = toNumber(resolverColumna(f,'CANT_CONTAC_CALL','CONTAC_CALL','CONTACTOS'));
       const contactoCampoEfectivo = ['CONTACTO','PROMESA','YA PAGO'].includes(mejorResultadoCampo);
-      const respp                 = resolverColumna(f,'RESPP','RESULTADO_PAGO','RES_PP','RESULTADO').toString().trim().toUpperCase();
+      const respp               = resolverColumna(f,'RESPP','RESULTADO_PAGO','RES_PP','RESULTADO').toString().trim().toUpperCase();
 
       masterDataCompleto.push({
         idOperacion:       resolverColumna(f,'OPERACION','NRO_OPERACION','ID_OPERACION').toString().trim(),
         codigoCliente:     resolverColumna(f,'CODIGO_CLIENTE','COD_CLIENTE','ID_CLIENTE').toString().trim(),
         ciclo:             limpiarCiclo(resolverColumna(f,'CICLO','NRO_CICLO','CICLO_COBRO')||''),
-        mes: resolverColumna(f,'MES','PERIODO','MES_GESTION').toString().trim().toUpperCase(),
+        mes:               resolverColumna(f,'MES','PERIODO','MES_GESTION').toString().trim().toUpperCase(),
         tramo:             resolverColumna(f,'TRAMO','TRAMO_MORA','BUCKET').toString().trim(),
         cliente:           resolverColumna(f,'CLIENTE','NOMBRE_CLIENTE','RAZON_SOCIAL').toString().trim(),
         nroCuota:          resolverColumna(f,'NRO_CUOTA','NUMERO_CUOTA','CUOTA_NRO').toString().trim(),
         mejorTipoContacto: resolverColumna(f,'MEJOR_TIPO_CONTACTO','TIPO_CONTACTO').toString().trim(),
-        mejorFecCompromiso:      parsearFecha(resolverColumna(f,'MEJOR_FEC_COMPROMISO')),
-        mejorTelefonoContacto:   resolverColumna(f,'MEJOR_TELEFONO_CONTACTO').toString().trim(),
-        ultTelefonoContacto:     resolverColumna(f,'ULT_TELEFONO_CONTACTO').toString().trim(),
+        mejorFecCompromiso:    parsearFecha(resolverColumna(f,'MEJOR_FEC_COMPROMISO')),
+        mejorTelefonoContacto: resolverColumna(f,'MEJOR_TELEFONO_CONTACTO').toString().trim(),
+        ultTelefonoContacto:   resolverColumna(f,'ULT_TELEFONO_CONTACTO').toString().trim(),
         estado:            resolverColumna(f,'ESTADO','ESTADO_CUENTA','ESTADO_REGISTRO').toString().trim().toUpperCase(),
         agente:            agenteRaw,
-        agenteSinAsignar: agenteRaw === '' ||
-  agenteRaw.toUpperCase() === 'SIN_ASIGNAR' ||
-  agenteRaw.toUpperCase() === 'SIN ASIGNAR' ||
-  agenteRaw.toUpperCase().startsWith('0 - USER') ||
-  agenteRaw.toUpperCase().startsWith('0 -USER'),
+        agenteSinAsignar:  agenteRaw===''||agenteRaw.toUpperCase()==='SIN_ASIGNAR'||agenteRaw.toUpperCase()==='SIN ASIGNAR'||agenteRaw.toUpperCase().startsWith('0 - USER')||agenteRaw.toUpperCase().startsWith('0 -USER'),
         q:                 toNumber(resolverColumna(f,'Q','CANTIDAD','CANT_CUENTAS')),
         gest, gestCall, gestIVR, gestEmail, gestSMS,
         contac:            contacCall,
@@ -582,31 +539,19 @@ function construirDatasetMaestro(callbackFin){
         ultimoMotivo,
         ultimaObservacion:   obs||'Sin observación registrada',
         calificacionSBS:     resolverColumna(f,'CALIFICACION_SBS','CALIF_SBS','SBS','CLASIFICACION_SBS').toString().trim()||'Normal',
-        tuvoVisitaCampo,
-        mejorDesRptaCampNP1,
-        mejorResultadoCampo,
-        contactoCampoEfectivo,
+        tuvoVisitaCampo, mejorDesRptaCampNP1, mejorResultadoCampo, contactoCampoEfectivo,
         agenteCampo:       resolverColumna(f,'MEJOR_AGENTE_CAMP','AGENTE_CAMPO').toString().trim(),
         tuvoContactoEfectivoGeneral: (contacCall>0)||contactoCampoEfectivo,
         deudorUnico:       esDeudorUnico(resolverColumna(f,'DEUDOR_UNICO','DEUDOR UNICO'))
       });
     }
-
     idx = fin;
     actualizarProgreso();
-
-    if(idx < total){
-      // Cede el hilo al navegador antes del siguiente lote
-      setTimeout(procesarLote, 0);
-    } else {
-      // ✅ Terminó — continuar con el flujo normal
-      masterData = [...masterDataCompleto];
-      if(typeof callbackFin === 'function') callbackFin();
-    }
+    if(idx < total){ setTimeout(procesarLote, 0); }
+    else { masterData = [...masterDataCompleto]; if(typeof callbackFin==='function') callbackFin(); }
   }
-
   actualizarProgreso();
-  setTimeout(procesarLote, 0); // arranca el primer lote
+  setTimeout(procesarLote, 0);
 }
 
 // ============================================================
@@ -614,7 +559,6 @@ function construirDatasetMaestro(callbackFin){
 // ============================================================
 const REGISTRO_MULTISELECT={};
 const ORDEN_MESES={ENE:1,FEB:2,MAR:3,ABR:4,MAY:5,JUN:6,JUL:7,AGO:8,SET:9,SEP:9,OCT:10,NOV:11,DIC:12};
-
 function ordenarOpciones(campo,opciones){ if(campo==='mes') return [...opciones].sort((a,b)=>(ORDEN_MESES[a.toString().trim().toUpperCase()]??99)-(ORDEN_MESES[b.toString().trim().toUpperCase()]??99)); return [...opciones].sort(); }
 function inicializarMultiselect(id,opciones,filtroObjRef,campoFiltro,callbackRender){ REGISTRO_MULTISELECT[id]={opciones:ordenarOpciones(campoFiltro,opciones),filtroObjRef,campoFiltro,callbackRender}; renderOpcionesMultiselect(id); }
 function renderOpcionesMultiselect(id,filtroTexto=''){ const reg=REGISTRO_MULTISELECT[id]; if(!reg) return; const cont=document.getElementById(id+'_options'); if(!cont) return; const sel=reg.filtroObjRef[reg.campoFiltro]; const ops=reg.opciones.filter(o=>o.toString().toLowerCase().includes(filtroTexto.toLowerCase())); if(ops.length===0){ cont.innerHTML='<div class="ms-empty">Sin resultados</div>'; return; } cont.innerHTML=ops.map(op=>{ const checked=sel.includes(op)?'checked':''; const sid=id+'_opt_'+op.toString().replace(/[^a-zA-Z0-9]/g,'_'); return `<label class="ms-option" for="${sid}"><input type="checkbox" id="${sid}" value="${op}" ${checked} onchange="toggleOpcionMultiselect('${id}','${op}',this.checked)"> ${op}</label>`; }).join(''); const chkAll=document.getElementById(id+'_all'); if(chkAll) chkAll.checked=reg.opciones.length>0&&sel.length===reg.opciones.length; }
@@ -630,109 +574,62 @@ document.addEventListener('click',function(e){ if(!e.target.closest('.multiselec
 // ============================================================
 function inicializarFiltros(){
   const ciclos  = valoresUnicos('ciclo');
-  const meses = valoresUnicos('mes').map(v => v.toString().trim().toUpperCase());
-  const estados = valoresUnicos('estado')
-    .filter(v => v !== '' && v !== null && v !== undefined)
-    .map(v => v.toString().trim().toUpperCase());
+  const meses   = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
+  const estados = valoresUnicos('estado').filter(v=>v!==''&&v!==null&&v!==undefined).map(v=>v.toString().trim().toUpperCase());
+  const agentes = valoresUnicos('agente').filter(a=>a!==''&&a.toUpperCase()!=='SIN_ASIGNAR'&&a.toUpperCase()!=='SIN ASIGNAR'&&!a.toUpperCase().startsWith('0 - USER'));
 
-const agentes = valoresUnicos('agente').filter(a =>
-  a !== '' &&
-  a.toUpperCase() !== 'SIN_ASIGNAR' &&
-  a.toUpperCase() !== 'SIN ASIGNAR' &&
-  !a.toUpperCase().startsWith('0 - USER')
-);
-
-  filtrosPanel = {
-    ciclo:        [...ciclos],
-    mes:          [...meses],
-    estadoCuenta: [...estados]
-  };
+  filtrosPanel = { ciclo:[...ciclos], mes:[...meses], estadoCuenta:[...estados] };
 
   const sel = document.getElementById('selectorAgentePanel');
   sel.innerHTML = '<option value="">— Selecciona un agente —</option>'
-    + agentes.sort().map(a => `<option value="${a}">${a}</option>`).join('');
+    + agentes.sort().map(a=>`<option value="${a}">${a}</option>`).join('');
 
-  inicializarMultiselect('msCicloPanel',   ciclos,   filtrosPanel, 'ciclo',        () => renderMiPanel());
-  inicializarMultiselect('msMesPanel',     meses,    filtrosPanel, 'mes',          () => renderMiPanel());
-  inicializarMultiselect('msEstadoPanel',  estados,  filtrosPanel, 'estadoCuenta', () => renderMiPanel());
+  inicializarMultiselect('msCicloPanel',  ciclos,  filtrosPanel,'ciclo',       ()=>renderMiPanel());
+  inicializarMultiselect('msMesPanel',    meses,   filtrosPanel,'mes',         ()=>renderMiPanel());
+  inicializarMultiselect('msEstadoPanel', estados, filtrosPanel,'estadoCuenta',()=>renderMiPanel());
 }
+
 function resetFiltrosPanel(){
   if(!masterDataCompleto.length) return;
-
-  filtrosPanel.ciclo = valoresUnicos('ciclo');
-  filtrosPanel.mes = valoresUnicos('mes').map(v => v.toString().trim().toUpperCase());
-  filtrosPanel.estadoCuenta = valoresUnicos('estado')
-    .filter(v => v !== '')
-    .map(v => v.toString().trim().toUpperCase());
-
-  ['msCicloPanel','msMesPanel','msEstadoPanel'].forEach(id => {
-    renderOpcionesMultiselect(id);
-    actualizarLabelMultiselect(id);
-  });
+  filtrosPanel.ciclo        = valoresUnicos('ciclo');
+  filtrosPanel.mes          = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
+  filtrosPanel.estadoCuenta = valoresUnicos('estado').filter(v=>v!=='').map(v=>v.toString().trim().toUpperCase());
+  ['msCicloPanel','msMesPanel','msEstadoPanel'].forEach(id=>{ renderOpcionesMultiselect(id); actualizarLabelMultiselect(id); });
   renderMiPanel();
   mostrarToast('🔄 Filtros restablecidos','ok');
 }
+
 // ============================================================
-// FILTRADO DE DATOS DEL PANEL
+// FILTRADO DE DATOS
 // ============================================================
 function datosFiltradosPanel(){
-  const agente = document.getElementById('selectorAgentePanel')?.value || '';
+  const agente = document.getElementById('selectorAgentePanel')?.value||'';
   if(!agente) return [];
-
-  // ── Paso 1: registros base del agente ──────────────────
-  const baseAgente = masterDataCompleto.filter(r => r.agente === agente);
-
-  // ── Paso 2: conjuntos disponibles SOLO para este agente ─
-  const ciclosDelAgente = [...new Set(baseAgente.map(r => r.ciclo))];
-  const mesesDelAgente  = [...new Set(baseAgente.map(r => r.mes))];
-
-  // ── Paso 3: aplicar filtros seleccionados ──────────────
-  // Si el array del filtro está vacío o tiene todos → no filtrar (mostrar todos)
+  const baseAgente = masterDataCompleto.filter(r=>r.agente===agente);
+  const ciclosDelAgente = [...new Set(baseAgente.map(r=>r.ciclo))];
+  const mesesDelAgente  = [...new Set(baseAgente.map(r=>r.mes))];
   const regCiclo = REGISTRO_MULTISELECT['msCicloPanel'];
   const regMes   = REGISTRO_MULTISELECT['msMesPanel'];
+    const todosCiclos = !regCiclo||filtrosPanel.ciclo.length===0||filtrosPanel.ciclo.length===regCiclo.opciones.length;
+  const todosMeses  = !regMes  ||filtrosPanel.mes.length===0  ||filtrosPanel.mes.length===regMes.opciones.length;
 
-  const todosCiclosSeleccionados = !regCiclo ||
-    filtrosPanel.ciclo.length === 0 ||
-    filtrosPanel.ciclo.length === regCiclo.opciones.length;
+  const setCiclos = new Set(todosCiclos ? ciclosDelAgente : filtrosPanel.ciclo.filter(c=>ciclosDelAgente.includes(c)));
+  const setMeses  = new Set(todosMeses  ? mesesDelAgente  : filtrosPanel.mes.map(m=>m.toString().trim().toUpperCase()).filter(m=>mesesDelAgente.includes(m)));
 
-  const todosMesesSeleccionados = !regMes ||
-    filtrosPanel.mes.length === 0 ||
-    filtrosPanel.mes.length === regMes.opciones.length;
-
-  const setCiclos = new Set(
-    todosCiclosSeleccionados
-      ? ciclosDelAgente
-      : filtrosPanel.ciclo.filter(c => ciclosDelAgente.includes(c))
-  );
-
-  const setMeses = new Set(
-    todosMesesSeleccionados
-      ? mesesDelAgente
-      : filtrosPanel.mes
-          .map(m => m.toString().trim().toUpperCase())
-          .filter(m => mesesDelAgente.includes(m))
-  );
-
-  // ── Paso 4: filtro de estados ──────────────────────────
   const regEstado = REGISTRO_MULTISELECT['msEstadoPanel'];
-  const todosEstadosSeleccionados = !regEstado ||
-    filtrosPanel.estadoCuenta.length === 0 ||
-    filtrosPanel.estadoCuenta.length === regEstado.opciones.length;
+  const todosEstados = !regEstado||filtrosPanel.estadoCuenta.length===0||filtrosPanel.estadoCuenta.length===regEstado.opciones.length;
+  const setEstados = todosEstados ? null : new Set(filtrosPanel.estadoCuenta.map(e=>e.toString().trim().toUpperCase()));
 
-  const setEstados = todosEstadosSeleccionados
-    ? null
-    : new Set(filtrosPanel.estadoCuenta.map(e => e.toString().trim().toUpperCase()));
-
-  // ── Paso 5: filtrar ────────────────────────────────────
-  return baseAgente.filter(r => {
+  return baseAgente.filter(r=>{
     if(!setCiclos.has(r.ciclo)) return false;
     if(!setMeses.has(r.mes.toString().trim().toUpperCase())) return false;
-    if(setEstados && !setEstados.has(r.estado.trim().toUpperCase())) return false;
+    if(setEstados&&!setEstados.has(r.estado.trim().toUpperCase())) return false;
     return true;
   });
 }
+
 // ============================================================
-// HELPERS DE AGRUPACIÓN
+// HELPERS
 // ============================================================
 function agruparPorFecha(datos,campoFecha){
   const grupos={};
@@ -755,44 +652,32 @@ function renderMiPanel(){
   const lE=filtrosPanel.estadoCuenta.length===0||filtrosPanel.estadoCuenta.length===totalEstados?'Todos los estados':filtrosPanel.estadoCuenta.join(', ');
   document.getElementById('agenteFechaDisplay').innerText='📅 '+fechaStr+' | '+lC+' · '+lM+' · '+lE;
 
-    if(!agente){
-    document.getElementById('panelKPIsAgente').innerHTML=
-      '<div class="estado-msg">Selecciona un agente para ver su panel personalizado.</div>';
-    document.getElementById('panelAlertasAgente').innerHTML=
-      '<tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>';
-    document.getElementById('iaAccionesGrid').innerHTML=
-      '<div class="estado-msg" style="color:#64748b;">Selecciona un agente para generar acciones.</div>';
+  if(!agente){
+    document.getElementById('panelKPIsAgente').innerHTML='<div class="estado-msg">Selecciona un agente para ver su panel personalizado.</div>';
+    document.getElementById('panelAlertasAgente').innerHTML='<tr><td colspan="14" class="estado-msg">Selecciona un agente.</td></tr>';
+    document.getElementById('iaAccionesGrid').innerHTML='<div class="estado-msg" style="color:#64748b;">Selecciona un agente para generar acciones.</div>';
     document.getElementById('iaResumenTexto').style.display='none';
     return;
   }
 
-  // ✅ CORRECTO: datos se declara ANTES de usarlo
   const datos = datosFiltradosPanel();
 
   if(datos.length===0){
-    document.getElementById('panelKPIsAgente').innerHTML=
-      '<div class="estado-msg">No hay datos para este agente con los filtros actuales.</div>';
-    document.getElementById('panelTipoCuotaCards').innerHTML=
-      '<div class="estado-msg">Sin datos.</div>';
-    document.getElementById('panelTablaDetalleTipoCuota').innerHTML=
-      '<tr><td colspan="6" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
-    document.getElementById('panelAlertasAgente').innerHTML=
-      '<tr><td colspan="14" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
-    document.getElementById('panelCanalAgente').innerHTML=
-      '<div class="estado-msg">Sin datos.</div>';
-    document.getElementById('panelMotivosNP0Agente').innerHTML=
-      '<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
-    document.getElementById('panelMotivosNP1Agente').innerHTML=
-      '<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
-    document.getElementById('tablaCanalesAutomatizados').innerHTML=
-      '<tr><td colspan="5" class="estado-msg">Sin datos para los filtros seleccionados.</td></tr>';
-    document.getElementById('iaAccionesGrid').innerHTML=
-      '<div class="estado-msg" style="color:#64748b;">Sin datos para los filtros actuales.</div>';
+    document.getElementById('panelKPIsAgente').innerHTML='<div class="estado-msg">No hay datos para este agente con los filtros actuales.</div>';
+    document.getElementById('panelTipoCuotaCards').innerHTML='<div class="estado-msg">Sin datos.</div>';
+    document.getElementById('panelTablaDetalleTipoCuota').innerHTML='<tr><td colspan="6" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('panelAlertasAgente').innerHTML='<tr><td colspan="14" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('panelCanalAgente').innerHTML='<div class="estado-msg">Sin datos.</div>';
+    document.getElementById('panelMotivosNP0Agente').innerHTML='<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('panelMotivosNP1Agente').innerHTML='<tr><td colspan="4" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('tablaCanalesAutomatizados').innerHTML='<tr><td colspan="5" class="estado-msg">Sin datos.</td></tr>';
+    document.getElementById('iaAccionesGrid').innerHTML='<div class="estado-msg" style="color:#64748b;">Sin datos para los filtros actuales.</div>';
     document.getElementById('iaResumenTexto').style.display='none';
-    if(chartAgenteTCInst){ chartAgenteTCInst.destroy(); chartAgenteTCInst=null; }
-    if(chartAgenteCanalInst){ chartAgenteCanalInst.destroy(); chartAgenteCanalInst=null; }
-    if(chartAgenteGestionDiariaInst){ chartAgenteGestionDiariaInst.destroy(); chartAgenteGestionDiariaInst=null; }
-    if(chartAgenteRecuperoDiarioInst){ chartAgenteRecuperoDiarioInst.destroy(); chartAgenteRecuperoDiarioInst=null; }
+    actualizarContadorPrioritarias(0,0);
+    if(chartAgenteTCInst){chartAgenteTCInst.destroy();chartAgenteTCInst=null;}
+    if(chartAgenteCanalInst){chartAgenteCanalInst.destroy();chartAgenteCanalInst=null;}
+    if(chartAgenteGestionDiariaInst){chartAgenteGestionDiariaInst.destroy();chartAgenteGestionDiariaInst=null;}
+    if(chartAgenteRecuperoDiarioInst){chartAgenteRecuperoDiarioInst.destroy();chartAgenteRecuperoDiarioInst=null;}
     return;
   }
 
@@ -922,36 +807,18 @@ function renderMiPanel(){
   if(seriePago.length>0) chartAgenteRecuperoDiarioInst=new Chart(ctxRD,{type:'bar',data:{labels:seriePago.map(s=>s[0]),datasets:[{type:'bar',label:'Recupero Diario',data:seriePago.map(s=>s[1]),backgroundColor:'#15803d',yAxisID:'y'},{type:'line',label:'Acumulado',data:acumSerie,borderColor:'#c2410c',backgroundColor:'transparent',yAxisID:'y1',tension:0.2}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,position:'left',ticks:{callback:v=>formatoMonedaCorto(v)}},y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>formatoMonedaCorto(v)}},x:{ticks:{maxTicksLimit:8,autoSkip:true,callback:function(v){return formatoFechaCorta(this.getLabelForValue(v));}}}},plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}}}});
 
   // ── Alertas Prioritarias ─────────────────────────────────
-  const pesoSBS={NORMAL:1,CPP:2,DEFICIENTE:3,DUDOSO:4,PERDIDA:5};
-const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
-  .sort((a,b) => b.cuota - a.cuota)
+  const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
+    .sort((a, b) => b.cuota - a.cuota);
+
   _alertasPrioritariasCache = alertas;
-actualizarContadorPrioritarias(alertas.length, alertas.length);
+  actualizarContadorPrioritarias(alertas.length, alertas.length);
 
-  const statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
-
-  document.getElementById('panelAlertasAgente').innerHTML=alertas.length===0
-    ?'<tr><td colspan="14" class="estado-msg">🎉 Sin cuentas críticas pendientes.</td></tr>'
-    :alertas.map((r,i)=>`<tr class="${r.diasVencimiento>60?'fila-urgente':r.diasVencimiento>30?'fila-atencion':''}">
-      <td>${i+1}</td>
-      <td><strong>${r.cliente}</strong></td>
-      <td style="font-size:11px;color:var(--slate-soft);">${r.ciclo}</td>
-      <td>${r.tramo}</td>
-      <td><strong>${formatoMoneda(r.cuota)}</strong></td>
-      <td><strong>${r.diasVencimiento??'—'}</strong></td>
-      <td>${badgeSBS(r.calificacionSBS)}</td>
-      <td>${r.tipoCuota || '—'}</td>
-      <td>${r.gest}</td>
-      <td>${r.mejorTipoContacto||'—'}</td>
-      <td>${r.ultimoEstadoGestion}</td>
-      <td>${r.ultimoMotivo}</td>
-      <td>${fmtFecha(r.fechaGestionCallCenter)}</td>
-      <td>${accionSugerida(r,statsAgente)}</td>
-    </tr>`).join('');
+  const statsAgente = { totalGest, totalContac, pctContac, totalQ, cuentasPagadas, pctAvance };
+  renderFilasPrioritarias(alertas, statsAgente);
 
   // ── Motivos NP0 / NP1 ───────────────────────────────────
   const sinPagoM=datos.filter(r=>r.respp!=='CON PAGO'), totalSP=sinPagoM.length;
-  const gNP0={},gNP1={};
+  const gNP0={}, gNP1={};
   sinPagoM.forEach(r=>{ gNP0[r.ultimoEstadoGestion]=(gNP0[r.ultimoEstadoGestion]||0)+1; gNP1[r.ultimoMotivo]=(gNP1[r.ultimoMotivo]||0)+1; });
   const renderMotivos=(obj,tbodyId)=>{
     const arr=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,8);
@@ -968,6 +835,80 @@ actualizarContadorPrioritarias(alertas.length, alertas.length);
   // ── Motor IA ─────────────────────────────────────────────
   generarAccionesIA(datos);
 
+} // ← FIN renderMiPanel()
+
+// ============================================================
+// RENDER FILAS PRIORITARIAS
+// ============================================================
+function renderFilasPrioritarias(lista, statsAgente) {
+  if (!statsAgente) {
+    const datos = datosFiltradosPanel();
+    const totalGest   = datos.reduce((a,r)=>a+r.gest,0);
+    const totalContac = datos.reduce((a,r)=>a+r.contac,0);
+    const totalQ      = datos.length;
+    const cuentasPagadas = datos.filter(r=>r.respp==='CON PAGO').length;
+    const totalCuota  = datos.reduce((a,r)=>a+r.cuota,0);
+    const totalPago   = datos.filter(r=>r.respp==='CON PAGO').reduce((a,r)=>a+r.pago,0);
+    const pctContac   = totalGest>0?(totalContac/totalGest*100):0;
+    const pctAvance   = totalCuota>0?(totalPago/totalCuota*100):0;
+    statsAgente = { totalGest, totalContac, pctContac, totalQ, cuentasPagadas, pctAvance };
+  }
+  document.getElementById('panelAlertasAgente').innerHTML = lista.length===0
+    ? '<tr><td colspan="14" class="estado-msg">🔍 Sin resultados para esa búsqueda.</td></tr>'
+    : lista.map((r,i)=>`
+        <tr class="${r.diasVencimiento>60?'fila-urgente':r.diasVencimiento>30?'fila-atencion':''}">
+          <td>${i+1}</td>
+          <td><strong>${r.cliente}</strong></td>
+          <td style="font-size:11px;color:var(--slate-soft);">${r.ciclo}</td>
+          <td>${r.tramo}</td>
+          <td><strong>${formatoMoneda(r.cuota)}</strong></td>
+          <td><strong>${r.diasVencimiento??'—'}</strong></td>
+          <td>${badgeSBS(r.calificacionSBS)}</td>
+          <td>${r.tipoCuota||'—'}</td>
+          <td>${r.gest}</td>
+          <td>${r.mejorTipoContacto||'—'}</td>
+          <td>${r.ultimoEstadoGestion}</td>
+          <td>${r.ultimoMotivo}</td>
+          <td>${fmtFecha(r.fechaGestionCallCenter)}</td>
+          <td>${accionSugerida(r,statsAgente)}</td>
+        </tr>`).join('');
+}
+
+// ============================================================
+// BUSCADOR PRIORITARIAS
+// ============================================================
+function filtrarTablaPrioritarias(){
+  const texto=document.getElementById('buscadorPrioritarias')?.value.trim().toLowerCase()||'';
+  if(!texto){
+    renderFilasPrioritarias(_alertasPrioritariasCache);
+    actualizarContadorPrioritarias(_alertasPrioritariasCache.length,_alertasPrioritariasCache.length);
+    return;
+  }
+  const filtradas=_alertasPrioritariasCache.filter(r=>
+    (r.cliente||'').toLowerCase().includes(texto)||
+    (r.ciclo||'').toLowerCase().includes(texto)||
+    (r.tramo||'').toLowerCase().includes(texto)||
+    (r.tipoCuota||'').toLowerCase().includes(texto)||
+    (r.calificacionSBS||'').toLowerCase().includes(texto)||
+    (r.ultimoEstadoGestion||'').toLowerCase().includes(texto)||
+    (r.ultimoMotivo||'').toLowerCase().includes(texto)
+  );
+  renderFilasPrioritarias(filtradas);
+  actualizarContadorPrioritarias(filtradas.length,_alertasPrioritariasCache.length);
+}
+
+function actualizarContadorPrioritarias(mostradas,total){
+  const el=document.getElementById('contadorPrioritarias');
+  if(!el) return;
+  el.innerHTML=mostradas===total
+    ?`📋 <strong>${total}</strong> cuentas sin pago`
+    :`🔍 <strong>${mostradas}</strong> de <strong>${total}</strong> cuentas`;
+}
+
+function limpiarBuscadorPrioritarias(){
+  const input=document.getElementById('buscadorPrioritarias');
+  if(input) input.value='';
+  filtrarTablaPrioritarias();
 }
 
 // ============================================================
@@ -1066,15 +1007,14 @@ function abrirModalIA(grupo){
     ?['#','Cliente','Ciclo','Tramo','Cuota USD','Pago USD','Fecha Pago','SBS']
     :grupo==='promesasPendientes'
     ?['#','Cliente','Ciclo','Tramo','Cuota USD','Días Mora','SBS','Fec. Compromiso','Últ. Contacto']
-    :['#','Cliente','Ciclo','Tramo','Cuota USD','Días Mora','SBS','Score','Gestiones','Últ. Estado'];
+    :['#','Cliente','Ciclo','Tramo','Cuota USD','Días Mora','SBS','Tipo Cuota','Gestiones','Últ. Estado'];
 
   document.getElementById('iaModalThead').innerHTML=cabeceras.map(c=>`<th>${c}</th>`).join('');
 
   const filas=datos.map((r,i)=>{
     if(grupo==='recuperadosHoy') return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td><b style="color:#34d399;">${formatoMoneda(r.pago)}</b></td><td>${fmtFecha(r.fechaPago)}</td><td>${badgeSBS(r.calificacionSBS)}</td></tr>`;
     if(grupo==='promesasPendientes') return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td>${r.diasVencimiento??'—'}</td><td>${badgeSBS(r.calificacionSBS)}</td><td><b style="color:#34d399;">${fmtFecha(r.mejorFecCompromiso)}</b></td><td>${r.mejorTipoContacto||'—'}</td></tr>`;
-    const score=r.score?Math.round(r.score).toLocaleString('es-PE'):'—';
-    return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td>${r.diasVencimiento??'—'}</td><td>${badgeSBS(r.calificacionSBS)}</td><td>${score}</td><td>${r.gest}</td><td>${r.ultimoEstadoGestion}</td></tr>`;
+    return `<tr><td>${i+1}</td><td>${r.cliente}</td><td>${r.ciclo}</td><td>${r.tramo}</td><td>${formatoMoneda(r.cuota)}</td><td>${r.diasVencimiento??'—'}</td><td>${badgeSBS(r.calificacionSBS)}</td><td>${r.tipoCuota||'—'}</td><td>${r.gest}</td><td>${r.ultimoEstadoGestion}</td></tr>`;
   }).join('');
 
   document.getElementById('iaModalBody').innerHTML=filas||'<tr><td colspan="10" class="estado-msg">Sin registros.</td></tr>';
@@ -1086,7 +1026,7 @@ function cerrarModalIA(){
 }
 
 // ============================================================
-// ACCIÓN SUGERIDA POR CUENTA
+// ACCIÓN SUGERIDA
 // ============================================================
 function accionSugerida(r,statsAgente){
   const sbs=(r.calificacionSBS||'').toUpperCase();
@@ -1097,64 +1037,35 @@ function accionSugerida(r,statsAgente){
   const tuvoCampo=r.tuvoVisitaCampo;
   const gestiones=r.gest||0;
 
-  // 1. Promesa activa vigente → confirmar
   if(tienePromesa&&r.mejorFecCompromiso){
     const hoy=new Date(); hoy.setHours(0,0,0,0);
     const fecComp=new Date(r.mejorFecCompromiso); fecComp.setHours(0,0,0,0);
-    if(fecComp>=hoy)
-      return `<span class="accion-badge accion-confirmar">✅ Confirmar promesa ${fmtFecha(r.mejorFecCompromiso)}</span>`;
-    else
-      return `<span class="accion-badge accion-llamar">📞 Promesa vencida — rellamar hoy</span>`;
+    if(fecComp>=hoy) return `<span class="accion-badge accion-confirmar">✅ Confirmar promesa ${fmtFecha(r.mejorFecCompromiso)}</span>`;
+    else return `<span class="accion-badge accion-llamar">📞 Promesa vencida — rellamar hoy</span>`;
   }
-
-  // 2. SBS crítico + mora alta → legal
-  if(['DUDOSO','PERDIDA'].includes(sbs)&&dias>60)
-    return `<span class="accion-badge accion-legal">⚖️ Escalar a gestión legal</span>`;
-
-  // 3. Sin contacto + sin campo + mora alta → campo
-  if(!contactoEfectivo&&!tuvoCampo&&dias>45)
-    return `<span class="accion-badge accion-campo">🚶 Enviar a visita de campo</span>`;
-
-  // 4. Teléfono apagado/no contesta repetido → WhatsApp
-  if(['TELF NO CONTESTA','TELEF APAGADO','NO CONTESTA'].some(m=>ultimoMotivo.includes(m))&&gestiones>=5)
-    return `<span class="accion-badge accion-whatsapp">💬 Contactar por WhatsApp/SMS</span>`;
-
-  // 5. Contacto efectivo sin promesa → re-llamar
-  if(contactoEfectivo&&!tienePromesa)
-    return `<span class="accion-badge accion-promesa">🎯 Re-llamar — negociar promesa</span>`;
-
-  // 6. Sin contacto, mora moderada → llamar
-  if(!contactoEfectivo&&dias<=45)
-    return `<span class="accion-badge accion-llamar">📞 Llamar — primer contacto</span>`;
-
-  // 7. CPP/Deficiente con mora → escalar supervisor
-  if(['CPP','DEFICIENTE'].includes(sbs)&&dias>30)
-    return `<span class="accion-badge accion-escalar">⚠️ Escalar a supervisor</span>`;
-
+  if(['DUDOSO','PERDIDA'].includes(sbs)&&dias>60) return `<span class="accion-badge accion-legal">⚖️ Escalar a gestión legal</span>`;
+  if(!contactoEfectivo&&!tuvoCampo&&dias>45) return `<span class="accion-badge accion-campo">🚶 Enviar a visita de campo</span>`;
+  if(['TELF NO CONTESTA','TELEF APAGADO','NO CONTESTA'].some(m=>ultimoMotivo.includes(m))&&gestiones>=5) return `<span class="accion-badge accion-whatsapp">💬 Contactar por WhatsApp/SMS</span>`;
+  if(contactoEfectivo&&!tienePromesa) return `<span class="accion-badge accion-promesa">🎯 Re-llamar — negociar promesa</span>`;
+  if(!contactoEfectivo&&dias<=45) return `<span class="accion-badge accion-llamar">📞 Llamar — primer contacto</span>`;
+  if(['CPP','DEFICIENTE'].includes(sbs)&&dias>30) return `<span class="accion-badge accion-escalar">⚠️ Escalar a supervisor</span>`;
   return `<span class="accion-badge accion-llamar">📞 Gestionar hoy</span>`;
 }
 
 // ============================================================
-// CANALES AUTOMATIZADOS (IVR / EMAIL / SMS)
+// CANALES AUTOMATIZADOS
 // ============================================================
 function renderCanalesAutomatizados(datos){
   const tbody=document.getElementById('tablaCanalesAutomatizados');
   if(!tbody) return;
-  const canales=[
-    {nombre:'IVR',   campo:'gestIVR'  },
-    {nombre:'EMAIL', campo:'gestEmail'},
-    {nombre:'SMS',   campo:'gestSMS'  }
-  ];
+  const canales=[{nombre:'IVR',campo:'gestIVR'},{nombre:'EMAIL',campo:'gestEmail'},{nombre:'SMS',campo:'gestSMS'}];
   const filas=canales.map(c=>{
-    const total   =datos.reduce((a,r)=>a+(r[c.campo]||0),0);
-    const conGest =datos.filter(r=>(r[c.campo]||0)>0).length;
+    const total=datos.reduce((a,r)=>a+(r[c.campo]||0),0);
+    const conGest=datos.filter(r=>(r[c.campo]||0)>0).length;
     const promedio=conGest>0?(total/conGest):0;
     return {nombre:c.nombre,total,conGest,promedio};
   }).filter(f=>f.total>0);
-  if(filas.length===0){
-    tbody.innerHTML='<tr><td colspan="5" class="estado-msg">Sin gestiones automatizadas registradas para este agente.</td></tr>';
-    return;
-  }
+  if(filas.length===0){ tbody.innerHTML='<tr><td colspan="5" class="estado-msg">Sin gestiones automatizadas registradas para este agente.</td></tr>'; return; }
   const totalGeneral=filas.reduce((a,f)=>a+f.total,0);
   tbody.innerHTML=filas.map(f=>`
     <tr>
@@ -1164,60 +1075,10 @@ function renderCanalesAutomatizados(datos){
       <td>${f.conGest.toLocaleString('es-PE')}</td>
       <td>${f.promedio.toFixed(1)}</td>
     </tr>`).join('')
-  +`<tr class="fila-total-general">
-      <td>TOTAL</td>
-      <td>${totalGeneral.toLocaleString('es-PE')}</td>
-      <td>100%</td><td>—</td><td>—</td>
-    </tr>`;
+  +`<tr class="fila-total-general"><td>TOTAL</td><td>${totalGeneral.toLocaleString('es-PE')}</td><td>100%</td><td>—</td><td>—</td></tr>`;
 }
 
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarModalIA(); });
-// ============================================================
-// BUSCADOR DE CUENTAS PRIORITARIAS
-// ============================================================
-function filtrarTablaPrioritarias() {
-  const texto = document.getElementById('buscadorPrioritarias')
-    ?.value.trim().toLowerCase() || '';
-
-  if (!texto) {
-    renderFilasPrioritarias(_alertasPrioritariasCache);
-    actualizarContadorPrioritarias(
-      _alertasPrioritariasCache.length,
-      _alertasPrioritariasCache.length
-    );
-    return;
-  }
-
-  const filtradas = _alertasPrioritariasCache.filter(r =>
-    (r.cliente       || '').toLowerCase().includes(texto) ||
-    (r.ciclo         || '').toLowerCase().includes(texto) ||
-    (r.tramo         || '').toLowerCase().includes(texto) ||
-    (r.tipoCuota     || '').toLowerCase().includes(texto) ||
-    (r.calificacionSBS || '').toLowerCase().includes(texto) ||
-    (r.ultimoEstadoGestion || '').toLowerCase().includes(texto) ||
-    (r.ultimoMotivo  || '').toLowerCase().includes(texto)
-  );
-
-  renderFilasPrioritarias(filtradas);
-  actualizarContadorPrioritarias(filtradas.length, _alertasPrioritariasCache.length);
-}
-
-function actualizarContadorPrioritarias(mostradas, total) {
-  const el = document.getElementById('contadorPrioritarias');
-  if (!el) return;
-  if (mostradas === total) {
-    el.innerHTML = `📋 <strong>${total}</strong> cuentas sin pago`;
-  } else {
-    el.innerHTML = `🔍 <strong>${mostradas}</strong> de <strong>${total}</strong> cuentas`;
-  }
-}
-
-function limpiarBuscadorPrioritarias() {
-  const input = document.getElementById('buscadorPrioritarias');
-  if (input) input.value = '';
-  filtrarTablaPrioritarias();
-}
-
 
 </script>
 </body>
