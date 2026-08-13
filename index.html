@@ -292,9 +292,28 @@
 <div style="margin-bottom:20px;">
   <div style="background:var(--panel);border-radius:10px;border:1px solid var(--border);padding:16px;">
     <h3>🚨 Mis Cuentas Prioritarias — Acción Inmediata</h3>
-    <div class="subtitle">Top cuentas sin pago ordenadas por monto de cuota USD (mayor a menor).</div>
-    <div style="overflow-x:auto;overflow-y:auto;max-height:420px;width:100%;">
-      <table class="tabla-prioritarias" style="min-width:1200px;width:100%;">
+    <div class="subtitle">Todas las cuentas sin pago ordenadas por monto de cuota USD (mayor a menor).</div>
+
+    <!-- Barra de búsqueda + contador -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+      <input
+        type="text"
+        id="buscadorPrioritarias"
+        placeholder="🔍 Buscar cliente, ciclo, tramo, tipo cuota..."
+        oninput="filtrarTablaPrioritarias()"
+        style="flex:1;min-width:260px;padding:8px 12px;border:1px solid var(--border);
+               border-radius:8px;font-size:13px;background:#fff;color:var(--slate);"
+      >
+      <span id="contadorPrioritarias"
+        style="font-size:12px;color:var(--slate-soft);white-space:nowrap;font-weight:600;">
+      </span>
+      <button class="secondary" onclick="limpiarBuscadorPrioritarias()"
+        style="padding:7px 12px;font-size:12px;">
+        ✖ Limpiar
+      </button>
+    </div>
+
+    <div style="overflow-x:auto;overflow-y:auto;max-height:520px;width:100%;">
         <thead>
           <tr>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">#</th>
@@ -394,6 +413,7 @@ let masterData = [];
 let filtrosPanel = { ciclo:[], mes:[], estadoCuenta:[] };
 let chartAgenteTCInst, chartAgenteCanalInst, chartAgenteGestionDiariaInst, chartAgenteRecuperoDiarioInst;
 let _iaUltimosGrupos = {};
+let _alertasPrioritariasCache = [];
 // ============================================================
 // AUTOCARGA AUTOMÁTICA AL ABRIR
 // ============================================================
@@ -903,9 +923,10 @@ function renderMiPanel(){
 
   // ── Alertas Prioritarias ─────────────────────────────────
   const pesoSBS={NORMAL:1,CPP:2,DEFICIENTE:3,DUDOSO:4,PERDIDA:5};
- const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
+const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
   .sort((a,b) => b.cuota - a.cuota)
-  .slice(0,30);
+  _alertasPrioritariasCache = alertas;
+actualizarContadorPrioritarias(alertas.length, alertas.length);
 
   const statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
 
@@ -1151,6 +1172,51 @@ function renderCanalesAutomatizados(datos){
 }
 
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarModalIA(); });
+// ============================================================
+// BUSCADOR DE CUENTAS PRIORITARIAS
+// ============================================================
+function filtrarTablaPrioritarias() {
+  const texto = document.getElementById('buscadorPrioritarias')
+    ?.value.trim().toLowerCase() || '';
+
+  if (!texto) {
+    renderFilasPrioritarias(_alertasPrioritariasCache);
+    actualizarContadorPrioritarias(
+      _alertasPrioritariasCache.length,
+      _alertasPrioritariasCache.length
+    );
+    return;
+  }
+
+  const filtradas = _alertasPrioritariasCache.filter(r =>
+    (r.cliente       || '').toLowerCase().includes(texto) ||
+    (r.ciclo         || '').toLowerCase().includes(texto) ||
+    (r.tramo         || '').toLowerCase().includes(texto) ||
+    (r.tipoCuota     || '').toLowerCase().includes(texto) ||
+    (r.calificacionSBS || '').toLowerCase().includes(texto) ||
+    (r.ultimoEstadoGestion || '').toLowerCase().includes(texto) ||
+    (r.ultimoMotivo  || '').toLowerCase().includes(texto)
+  );
+
+  renderFilasPrioritarias(filtradas);
+  actualizarContadorPrioritarias(filtradas.length, _alertasPrioritariasCache.length);
+}
+
+function actualizarContadorPrioritarias(mostradas, total) {
+  const el = document.getElementById('contadorPrioritarias');
+  if (!el) return;
+  if (mostradas === total) {
+    el.innerHTML = `📋 <strong>${total}</strong> cuentas sin pago`;
+  } else {
+    el.innerHTML = `🔍 <strong>${mostradas}</strong> de <strong>${total}</strong> cuentas`;
+  }
+}
+
+function limpiarBuscadorPrioritarias() {
+  const input = document.getElementById('buscadorPrioritarias');
+  if (input) input.value = '';
+  filtrarTablaPrioritarias();
+}
 
 
 </script>
