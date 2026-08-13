@@ -292,7 +292,7 @@
 <div style="margin-bottom:20px;">
   <div style="background:var(--panel);border-radius:10px;border:1px solid var(--border);padding:16px;">
     <h3>🚨 Mis Cuentas Prioritarias — Acción Inmediata</h3>
-    <div class="subtitle">Top cuentas sin pago ordenadas por score de prioridad (SBS × Mora × Monto).</div>
+    <div class="subtitle">Top cuentas sin pago ordenadas por monto de cuota USD (mayor a menor).</div>
     <div style="overflow-x:auto;overflow-y:auto;max-height:420px;width:100%;">
       <table class="tabla-prioritarias" style="min-width:1200px;width:100%;">
         <thead>
@@ -304,7 +304,7 @@
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cuota USD</th>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Días Venc.</th>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">SBS</th>
-            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Score</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tipo Cuota</th>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Gestiones</th>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Mejor Contacto</th>
             <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Estado (NP0)</th>
@@ -903,9 +903,9 @@ function renderMiPanel(){
 
   // ── Alertas Prioritarias ─────────────────────────────────
   const pesoSBS={NORMAL:1,CPP:2,DEFICIENTE:3,DUDOSO:4,PERDIDA:5};
-  const alertas=datos.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0)
-    .map(r=>({...r,score:(pesoSBS[(r.calificacionSBS||'').toUpperCase()]||1)*(Math.abs(r.diasVencimiento||0)+1)*r.cuota}))
-    .sort((a,b)=>b.score-a.score).slice(0,30);
+ const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
+  .sort((a,b) => b.cuota - a.cuota)
+  .slice(0,30);
 
   const statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
 
@@ -919,7 +919,7 @@ function renderMiPanel(){
       <td><strong>${formatoMoneda(r.cuota)}</strong></td>
       <td><strong>${r.diasVencimiento??'—'}</strong></td>
       <td>${badgeSBS(r.calificacionSBS)}</td>
-      <td>${Math.round(r.score).toLocaleString('es-PE')}</td>
+      <td>${r.tipoCuota || '—'}</td>
       <td>${r.gest}</td>
       <td>${r.mejorTipoContacto||'—'}</td>
       <td>${r.ultimoEstadoGestion}</td>
