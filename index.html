@@ -509,7 +509,7 @@ function construirDatasetMaestro(callbackFin){
 
     for(let i = idx; i < fin; i++){
       const f = rawRows[i];
-      const agenteRaw = resolverColumna(f,'AGENTE_ASIG','AGENTE','ASESOR','NOMBRE_AGENTE','AGENTE_ASIGNADO').toString().trim();
+      const agenteRaw = resolverColumna(f, 'ASESOR_ASIGN', 'AGENTE_ASIG', 'AGENTE', 'ASESOR', 'NOMBRE_AGENTE', 'AGENTE_ASIGNADO').toString().trim();
       const gestCall  = toNumber(resolverColumna(f,'CANT_GEST_CALL','GEST_CALL','GESTIONES_CALL'));
       const gestIVR   = toNumber(resolverColumna(f,'CANT_GEST_IVR','GEST_IVR'));
       const gestEmail = toNumber(resolverColumna(f,'CANT_GEST_EMAIL','GEST_EMAIL'));
@@ -541,7 +541,11 @@ function construirDatasetMaestro(callbackFin){
         ultTelefonoContacto:     resolverColumna(f,'ULT_TELEFONO_CONTACTO').toString().trim(),
         estado:            resolverColumna(f,'ESTADO','ESTADO_CUENTA','ESTADO_REGISTRO').toString().trim().toUpperCase(),
         agente:            agenteRaw,
-        agenteSinAsignar:  agenteRaw.startsWith('0')||agenteRaw.toUpperCase().includes('SIN_ASIGNAR')||agenteRaw.toUpperCase().includes('SIN ASIGNAR')||agenteRaw==='',
+        agenteSinAsignar: agenteRaw === '' ||
+  agenteRaw.toUpperCase() === 'SIN_ASIGNAR' ||
+  agenteRaw.toUpperCase() === 'SIN ASIGNAR' ||
+  agenteRaw.toUpperCase().startsWith('0 - USER') ||
+  agenteRaw.toUpperCase().startsWith('0 -USER'),
         q:                 toNumber(resolverColumna(f,'Q','CANTIDAD','CANT_CUENTAS')),
         gest, gestCall, gestIVR, gestEmail, gestSMS,
         contac:            contacCall,
@@ -611,7 +615,12 @@ function inicializarFiltros(){
     .filter(v => v !== '' && v !== null && v !== undefined)
     .map(v => v.toString().trim().toUpperCase());
 
-  const agentes = valoresUnicos('agente').filter(a => a !== '');
+const agentes = valoresUnicos('agente').filter(a =>
+  a !== '' &&
+  a.toUpperCase() !== 'SIN_ASIGNAR' &&
+  a.toUpperCase() !== 'SIN ASIGNAR' &&
+  !a.toUpperCase().startsWith('0 - USER')
+);
 
   filtrosPanel = {
     ciclo:        [...ciclos],
@@ -1147,4 +1156,3 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarModa
 </script>
 </body>
 </html>
-
