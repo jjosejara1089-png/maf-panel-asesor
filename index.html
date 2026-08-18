@@ -76,6 +76,7 @@
   .kpi-agente-card.kac-morado::before { background:#7c3aed; }
   .kpi-agente-card.kac-teal::before { background:#0d9488; }
   .kpi-agente-card.kac-gold::before { background:#ca8a04; }
+  .kpi-agente-card.kac-dias::before { background:#0891b2; }
   .kpi-agente-card .ka-label { font-size:11px; color:var(--slate-soft); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; }
   .kpi-agente-card .ka-value { font-size:26px; font-weight:800; color:var(--navy); margin:6px 0 2px 0; line-height:1; }
   .kpi-agente-card .ka-sub { font-size:11px; color:var(--slate-lighter); }
@@ -156,6 +157,22 @@
   .toast.toast-ok { border-left-color:#34d399; }
   .toast.toast-warn { border-left-color:#fbbf24; }
   .toast.toast-err { border-left-color:#f87171; }
+  /* ── Flag Fecha Gestión ── */
+  .fecha-flag-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .fecha-flag-bar label { color:#bfdbfe; font-size:12px; font-weight:600; }
+  .fecha-flag-bar input[type=date] { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); padding:7px 10px; border-radius:8px; font-size:13px; cursor:pointer; }
+  .fecha-flag-bar input[type=date]::-webkit-calendar-picker-indicator { filter:invert(1); }
+  .flag-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+  .flag-activo { background:rgba(59,130,246,0.3); color:#93c5fd; border:1px solid rgba(59,130,246,0.5); }
+  .flag-inactivo { background:rgba(100,116,139,0.2); color:#94a3b8; }
+  /* ── Días Trabajados / Inasistencia ── */
+  .alerta-inasistencia { background:linear-gradient(135deg,rgba(220,38,38,0.15),rgba(220,38,38,0.05)); border:1px solid rgba(220,38,38,0.4); border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+  .alerta-inasistencia .ai-icono { font-size:24px; flex-shrink:0; }
+  .alerta-inasistencia .ai-texto { flex:1; }
+  .alerta-inasistencia .ai-titulo { color:#fca5a5; font-size:13px; font-weight:700; margin-bottom:2px; }
+  .alerta-inasistencia .ai-desc { color:#94a3b8; font-size:12px; line-height:1.6; }
+  .alerta-ok { background:linear-gradient(135deg,rgba(13,148,136,0.15),rgba(13,148,136,0.05)) !important; border-color:rgba(13,148,136,0.4) !important; }
+  .alerta-ok .ai-titulo { color:#6ee7b7 !important; }
 </style>
 </head>
 <body>
@@ -220,7 +237,27 @@
         </div>
       </div>
     </div>
-    <button class="secondary" onclick="resetFiltrosPanel()" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">🔄 Limpiar</button>
+
+    <!-- ── NUEVO: Flag Fechas de Gestión ── -->
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <div class="fecha-flag-bar">
+        <label>📅 Fecha Gestión Desde</label>
+        <input type="date" id="flagFechaDesde" onchange="renderMiPanel()">
+        <label>Hasta</label>
+        <input type="date" id="flagFechaHasta" onchange="renderMiPanel()">
+        <span id="flagFechaBadge" class="flag-badge flag-inactivo">Sin filtro de fecha</span>
+        <button onclick="resetFiltroFecha()"
+          style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.3);
+                 padding:6px 10px;font-size:12px;border-radius:8px;">
+          ✖ Fecha
+        </button>
+      </div>
+    </div>
+
+    <button class="secondary" onclick="resetFiltrosPanel()"
+      style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.3);">
+      🔄 Limpiar todo
+    </button>
   </div>
 
   <div id="panelKPIsAgente">
@@ -595,8 +632,43 @@ function resetFiltrosPanel(){
   filtrosPanel.mes          = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
   filtrosPanel.estadoCuenta = valoresUnicos('estado').filter(v=>v!=='').map(v=>v.toString().trim().toUpperCase());
   ['msCicloPanel','msMesPanel','msEstadoPanel'].forEach(id=>{ renderOpcionesMultiselect(id); actualizarLabelMultiselect(id); });
+  resetFiltroFecha();
   renderMiPanel();
   mostrarToast('🔄 Filtros restablecidos','ok');
+}
+
+// ============================================================
+// FLAG FECHA GESTIÓN
+// ============================================================
+function getFiltroFechas(){
+  const desde = document.getElementById('flagFechaDesde')?.value;
+  const hasta = document.getElementById('flagFechaHasta')?.value;
+  return {
+    desde: desde ? new Date(desde+'T00:00:00') : null,
+    hasta: hasta ? new Date(hasta+'T23:59:59') : null
+  };
+}
+
+function resetFiltroFecha(){
+  const d = document.getElementById('flagFechaDesde');
+  const h = document.getElementById('flagFechaHasta');
+  if(d) d.value = '';
+  if(h) h.value = '';
+  actualizarBadgeFecha();
+}
+
+function actualizarBadgeFecha(){
+  const badge = document.getElementById('flagFechaBadge');
+  if(!badge) return;
+  const { desde, hasta } = getFiltroFechas();
+  if(!desde && !hasta){
+    badge.className = 'flag-badge flag-inactivo';
+    badge.innerText = 'Sin filtro de fecha';
+  } else {
+    badge.className = 'flag-badge flag-activo';
+    const fmt = f => f ? f.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '...';
+    badge.innerText = `📅 ${fmt(desde)} → ${fmt(hasta)}`;
+  }
 }
 
 // ============================================================
@@ -610,20 +682,28 @@ function datosFiltradosPanel(){
   const mesesDelAgente  = [...new Set(baseAgente.map(r=>r.mes))];
   const regCiclo = REGISTRO_MULTISELECT['msCicloPanel'];
   const regMes   = REGISTRO_MULTISELECT['msMesPanel'];
-    const todosCiclos = !regCiclo||filtrosPanel.ciclo.length===0||filtrosPanel.ciclo.length===regCiclo.opciones.length;
+  const todosCiclos = !regCiclo||filtrosPanel.ciclo.length===0||filtrosPanel.ciclo.length===regCiclo.opciones.length;
   const todosMeses  = !regMes  ||filtrosPanel.mes.length===0  ||filtrosPanel.mes.length===regMes.opciones.length;
-
   const setCiclos = new Set(todosCiclos ? ciclosDelAgente : filtrosPanel.ciclo.filter(c=>ciclosDelAgente.includes(c)));
   const setMeses  = new Set(todosMeses  ? mesesDelAgente  : filtrosPanel.mes.map(m=>m.toString().trim().toUpperCase()).filter(m=>mesesDelAgente.includes(m)));
-
   const regEstado = REGISTRO_MULTISELECT['msEstadoPanel'];
   const todosEstados = !regEstado||filtrosPanel.estadoCuenta.length===0||filtrosPanel.estadoCuenta.length===regEstado.opciones.length;
   const setEstados = todosEstados ? null : new Set(filtrosPanel.estadoCuenta.map(e=>e.toString().trim().toUpperCase()));
+
+  // Filtro de fechas de gestión
+  actualizarBadgeFecha();
+  const { desde, hasta } = getFiltroFechas();
 
   return baseAgente.filter(r=>{
     if(!setCiclos.has(r.ciclo)) return false;
     if(!setMeses.has(r.mes.toString().trim().toUpperCase())) return false;
     if(setEstados&&!setEstados.has(r.estado.trim().toUpperCase())) return false;
+    if(desde || hasta){
+      const fg = r.fechaGestionCallCenter;
+      if(!fg) return false;
+      if(desde && fg < desde) return false;
+      if(hasta && fg > hasta) return false;
+    }
     return true;
   });
 }
@@ -635,6 +715,166 @@ function agruparPorFecha(datos,campoFecha){
   const grupos={};
   datos.forEach(r=>{ const f=r[campoFecha]; if(!f) return; const key=f.toISOString().slice(0,10); grupos[key]=(grupos[key]||0)+1; });
   return Object.entries(grupos).sort((a,b)=>a[0]<b[0]?-1:1);
+}
+
+// ============================================================
+// CALENDARIO LABORAL MAF
+// Lunes–Viernes : 08:30 – 18:30
+// Sábados       : 09:00 – 13:00
+// Domingos      : NO LABORAL
+// ============================================================
+function esDiaLaboralMAF(fecha){
+  const dow = fecha.getDay();
+  return dow >= 1 && dow <= 6;
+}
+
+function calcularDiasHabilesMAF(fechaInicioISO, fechaFinISO){
+  const inicio  = new Date(fechaInicioISO + 'T00:00:00');
+  const fin     = new Date(fechaFinISO    + 'T00:00:00');
+  let completos = 0;
+  let medios    = 0;
+  const cursor  = new Date(inicio);
+  while(cursor <= fin){
+    const dow = cursor.getDay();
+    if(dow >= 1 && dow <= 5) completos++;
+    else if(dow === 6)        medios++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return { completos, medios, totalEquivalente: completos + medios * 0.5 };
+}
+
+function calcularDiasTrabajados(datos){
+  const diasUnicos = new Set();
+  datos.forEach(r => {
+    if(r.fechaGestionCallCenter){
+      diasUnicos.add(r.fechaGestionCallCenter.toISOString().slice(0,10));
+    }
+  });
+  return [...diasUnicos].sort();
+}
+
+function calcularDiasTrabajadosConPeso(diasISO){
+  let peso = 0;
+  let completos = 0;
+  let sabados   = 0;
+  diasISO.forEach(iso => {
+    const dow = new Date(iso + 'T12:00:00').getDay();
+    if(dow >= 1 && dow <= 5){ peso += 1.0; completos++; }
+    else if(dow === 6)       { peso += 0.5; sabados++;   }
+  });
+  return { peso, completos, sabados, total: diasISO.length };
+}
+
+function renderAlertaInasistencia(contenedor, datos){
+  const diasTrabajadosISO = calcularDiasTrabajados(datos);
+  const cantTrabajados    = diasTrabajadosISO.length;
+
+  if(cantTrabajados === 0){
+    contenedor.innerHTML = `
+      <div class="alerta-inasistencia">
+        <div class="ai-icono">⚠️</div>
+        <div class="ai-texto">
+          <div class="ai-titulo">Sin gestiones registradas en el período</div>
+          <div class="ai-desc">No se encontraron fechas de gestión para este agente con los filtros actuales.</div>
+        </div>
+      </div>`;
+    return { cantTrabajados:0, diasHabiles:0, pctAsistencia:0 };
+  }
+
+  const primerDia  = diasTrabajadosISO[0];
+  const ultimoDia  = diasTrabajadosISO[diasTrabajadosISO.length - 1];
+  const habilesMAF = calcularDiasHabilesMAF(primerDia, ultimoDia);
+  const trabajadosPeso = calcularDiasTrabajadosConPeso(diasTrabajadosISO);
+
+  const esperado      = habilesMAF.totalEquivalente;
+  const realizado     = trabajadosPeso.peso;
+  const ausente       = Math.max(0, esperado - realizado);
+  const pctAsistencia = esperado > 0 ? (realizado / esperado * 100) : 100;
+  const hayAlerta     = pctAsistencia < 80;
+
+  // Detectar días específicos sin gestión
+  const setTrabajados = new Set(diasTrabajadosISO);
+  const diasAusentesDetalle = [];
+  const cursorDet = new Date(primerDia + 'T12:00:00');
+  const finDet    = new Date(ultimoDia + 'T12:00:00');
+  while(cursorDet <= finDet){
+    const dow = cursorDet.getDay();
+    const iso = cursorDet.toISOString().slice(0,10);
+    if((dow >= 1 && dow <= 6) && !setTrabajados.has(iso)){
+      const nombreDia = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][dow];
+      diasAusentesDetalle.push({ iso, nombreDia, esSabado: dow===6 });
+    }
+    cursorDet.setDate(cursorDet.getDate() + 1);
+  }
+
+  const fmtD = iso => { const p=iso.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
+
+  let detalleAusencias = '';
+  if(diasAusentesDetalle.length > 0){
+    const visibles = diasAusentesDetalle.slice(0, 5);
+    detalleAusencias = `
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+        ${visibles.map(d=>`
+          <span style="background:rgba(220,38,38,0.2);color:#fca5a5;padding:2px 8px;
+                border-radius:12px;font-size:11px;font-weight:600;">
+            ${d.nombreDia} ${fmtD(d.iso)}${d.esSabado?' (½)':''}
+          </span>`).join('')}
+        ${diasAusentesDetalle.length > 5
+          ? `<span style="color:#64748b;font-size:11px;padding:2px 6px;">
+               +${diasAusentesDetalle.length - 5} más...
+             </span>` : ''}
+      </div>`;
+  }
+
+  contenedor.innerHTML = `
+    <div class="alerta-inasistencia ${hayAlerta ? '' : 'alerta-ok'}"
+         style="flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;width:100%;">
+        <div class="ai-icono">${hayAlerta ? '🔴' : '✅'}</div>
+        <div class="ai-texto" style="flex:1;">
+          <div class="ai-titulo">
+            ${hayAlerta
+              ? `⚠️ Alerta de inasistencia — ${ausente.toFixed(1)} día(s) equivalente(s) sin gestión`
+              : `✅ Asistencia regular — ${cantTrabajados} día(s) con gestión registrada`}
+          </div>
+          <div class="ai-desc">
+            Período: <strong style="color:#e2e8f0;">${fmtD(primerDia)}</strong> →
+            <strong style="color:#e2e8f0;">${fmtD(ultimoDia)}</strong>
+            &nbsp;·&nbsp;
+            Días hábiles esperados:
+            <strong style="color:#e2e8f0;">
+              ${habilesMAF.completos} Lun–Vie + ${habilesMAF.medios} Sáb
+              = ${esperado.toFixed(1)} equiv.
+            </strong>
+            &nbsp;·&nbsp;
+            Realizados:
+            <strong style="color:#e2e8f0;">
+              ${trabajadosPeso.completos} Lun–Vie
+              ${trabajadosPeso.sabados > 0 ? `+ ${trabajadosPeso.sabados} Sáb` : ''}
+              = ${realizado.toFixed(1)} equiv.
+            </strong>
+            &nbsp;·&nbsp;
+            Horario: <strong style="color:#e2e8f0;">Lun–Vie 08:30–18:30 · Sáb 09:00–13:00</strong>
+          </div>
+        </div>
+        <div style="text-align:right;min-width:80px;flex-shrink:0;">
+          <div style="font-size:28px;font-weight:800;
+                      color:${hayAlerta?'#fca5a5':'#6ee7b7'};">
+            ${pctAsistencia.toFixed(0)}%
+          </div>
+          <div style="font-size:10px;color:#64748b;">asistencia</div>
+        </div>
+      </div>
+      ${diasAusentesDetalle.length > 0 ? `
+        <div style="padding-left:36px;">
+          <div style="font-size:11px;color:#64748b;margin-bottom:4px;">
+            📅 Días sin gestión detectados:
+          </div>
+          ${detalleAusencias}
+        </div>` : ''}
+    </div>`;
+
+  return { cantTrabajados, diasHabiles:esperado, diasAusente:ausente, pctAsistencia, diasAusentesDetalle };
 }
 
 // ============================================================
@@ -704,7 +944,7 @@ function renderMiPanel(){
   const semLabel=(s,v,suf)=>`<span class="ka-semaforo ka-sem-${s}">${s==='verde'?'✅':s==='amarillo'?'⚠️':'🔴'} ${v}${suf}</span>`;
 
   document.getElementById('panelKPIsAgente').innerHTML=`
-    <div class="kpi-agente-grid">
+    <div class="kpi-agente-grid" id="kpiAgenteGrid">
       <div class="kpi-agente-card kac-azul">
         <div class="ka-label">Cuentas Asignadas</div><div class="ka-value">${totalQ.toLocaleString('es-PE')}</div>
         <div class="ka-sub">Cartera total del agente</div>
@@ -738,6 +978,49 @@ function renderMiPanel(){
         ${semLabel(semAvance,pctAvance.toFixed(1),'%')}
       </div>
     </div>`;
+
+  // ── Días Trabajados + Alerta Inasistencia ──────────────
+  const kpiGrid = document.getElementById('kpiAgenteGrid');
+  const kpiStats = { cantTrabajados:0, diasHabiles:0, pctAsistencia:0 };
+  const diasTrabISO = calcularDiasTrabajados(datos);
+  const diasTrabPeso = calcularDiasTrabajadosConPeso(diasTrabISO);
+
+  if(diasTrabISO.length > 0){
+    const habilesMAF = calcularDiasHabilesMAF(diasTrabISO[0], diasTrabISO[diasTrabISO.length-1]);
+    kpiStats.cantTrabajados = diasTrabISO.length;
+    kpiStats.diasHabiles    = habilesMAF.totalEquivalente;
+    kpiStats.pctAsistencia  = habilesMAF.totalEquivalente > 0
+      ? (diasTrabPeso.peso / habilesMAF.totalEquivalente * 100) : 100;
+  }
+
+  // KPI card días trabajados
+  if(kpiGrid){
+    const cardDias = document.createElement('div');
+    cardDias.className = 'kpi-agente-card kac-dias';
+    const semDias = kpiStats.pctAsistencia>=80?'verde':kpiStats.pctAsistencia>=60?'amarillo':'rojo';
+    cardDias.innerHTML = `
+      <div class="ka-label">Días con Gestión</div>
+      <div class="ka-value" style="color:#0891b2;">${diasTrabPeso.completos + diasTrabPeso.sabados}</div>
+      <div class="ka-sub">
+        ${diasTrabPeso.completos} Lun–Vie
+        ${diasTrabPeso.sabados>0?`· ${diasTrabPeso.sabados} Sáb`:''}
+        · de ${kpiStats.diasHabiles.toFixed(1)} equiv.
+      </div>
+      <span class="ka-semaforo ka-sem-${semDias}">
+        ${semDias==='verde'?'✅':semDias==='amarillo'?'⚠️':'🔴'}
+        ${kpiStats.pctAsistencia.toFixed(1)}% asistencia
+      </span>`;
+    kpiGrid.appendChild(cardDias);
+  }
+
+  // Alerta de inasistencia debajo del grid de KPIs
+  const panelKPI = document.getElementById('panelKPIsAgente');
+  const existente = document.getElementById('alertaInasistenciaBox');
+  if(existente) existente.remove();
+  const contenedorAlerta = document.createElement('div');
+  contenedorAlerta.id = 'alertaInasistenciaBox';
+  renderAlertaInasistencia(contenedorAlerta, datos);
+  panelKPI.appendChild(contenedorAlerta);
 
   // ── Tipo de Cuota Cards ──────────────────────────────────
   const coloresTCCard=['tc-card-normal','tc-card-balon','tc-card-bigticket','tc-card-taxi','tc-card-top','tc-card-otro'];
@@ -807,14 +1090,11 @@ function renderMiPanel(){
   if(seriePago.length>0) chartAgenteRecuperoDiarioInst=new Chart(ctxRD,{type:'bar',data:{labels:seriePago.map(s=>s[0]),datasets:[{type:'bar',label:'Recupero Diario',data:seriePago.map(s=>s[1]),backgroundColor:'#15803d',yAxisID:'y'},{type:'line',label:'Acumulado',data:acumSerie,borderColor:'#c2410c',backgroundColor:'transparent',yAxisID:'y1',tension:0.2}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,position:'left',ticks:{callback:v=>formatoMonedaCorto(v)}},y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>formatoMonedaCorto(v)}},x:{ticks:{maxTicksLimit:8,autoSkip:true,callback:function(v){return formatoFechaCorta(this.getLabelForValue(v));}}}},plugins:{legend:{position:'top',labels:{boxWidth:12,font:{size:11}}}}}});
 
   // ── Alertas Prioritarias ─────────────────────────────────
-  const alertas = datos.filter(r => r.respp !== 'CON PAGO' && r.cuota > 0)
-    .sort((a, b) => b.cuota - a.cuota);
-
-  _alertasPrioritariasCache = alertas;
-  actualizarContadorPrioritarias(alertas.length, alertas.length);
-
-  const statsAgente = { totalGest, totalContac, pctContac, totalQ, cuentasPagadas, pctAvance };
-  renderFilasPrioritarias(alertas, statsAgente);
+  const alertas=datos.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0).sort((a,b)=>b.cuota-a.cuota);
+  _alertasPrioritariasCache=alertas;
+  actualizarContadorPrioritarias(alertas.length,alertas.length);
+  const statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
+  renderFilasPrioritarias(alertas,statsAgente);
 
   // ── Motivos NP0 / NP1 ───────────────────────────────────
   const sinPagoM=datos.filter(r=>r.respp!=='CON PAGO'), totalSP=sinPagoM.length;
@@ -840,22 +1120,22 @@ function renderMiPanel(){
 // ============================================================
 // RENDER FILAS PRIORITARIAS
 // ============================================================
-function renderFilasPrioritarias(lista, statsAgente) {
-  if (!statsAgente) {
-    const datos = datosFiltradosPanel();
-    const totalGest   = datos.reduce((a,r)=>a+r.gest,0);
-    const totalContac = datos.reduce((a,r)=>a+r.contac,0);
-    const totalQ      = datos.length;
-    const cuentasPagadas = datos.filter(r=>r.respp==='CON PAGO').length;
-    const totalCuota  = datos.reduce((a,r)=>a+r.cuota,0);
-    const totalPago   = datos.filter(r=>r.respp==='CON PAGO').reduce((a,r)=>a+r.pago,0);
-    const pctContac   = totalGest>0?(totalContac/totalGest*100):0;
-    const pctAvance   = totalCuota>0?(totalPago/totalCuota*100):0;
-    statsAgente = { totalGest, totalContac, pctContac, totalQ, cuentasPagadas, pctAvance };
+function renderFilasPrioritarias(lista, statsAgente){
+  if(!statsAgente){
+    const datos=datosFiltradosPanel();
+    const totalGest=datos.reduce((a,r)=>a+r.gest,0);
+    const totalContac=datos.reduce((a,r)=>a+r.contac,0);
+    const totalQ=datos.length;
+    const cuentasPagadas=datos.filter(r=>r.respp==='CON PAGO').length;
+    const totalCuota=datos.reduce((a,r)=>a+r.cuota,0);
+    const totalPago=datos.filter(r=>r.respp==='CON PAGO').reduce((a,r)=>a+r.pago,0);
+    const pctContac=totalGest>0?(totalContac/totalGest*100):0;
+    const pctAvance=totalCuota>0?(totalPago/totalCuota*100):0;
+    statsAgente={totalGest,totalContac,pctContac,totalQ,cuentasPagadas,pctAvance};
   }
-  document.getElementById('panelAlertasAgente').innerHTML = lista.length===0
-    ? '<tr><td colspan="14" class="estado-msg">🔍 Sin resultados para esa búsqueda.</td></tr>'
-    : lista.map((r,i)=>`
+  document.getElementById('panelAlertasAgente').innerHTML=lista.length===0
+    ?'<tr><td colspan="14" class="estado-msg">🔍 Sin resultados para esa búsqueda.</td></tr>'
+    :lista.map((r,i)=>`
         <tr class="${r.diasVencimiento>60?'fila-urgente':r.diasVencimiento>30?'fila-atencion':''}">
           <td>${i+1}</td>
           <td><strong>${r.cliente}</strong></td>
@@ -1058,14 +1338,22 @@ function accionSugerida(r,statsAgente){
 function renderCanalesAutomatizados(datos){
   const tbody=document.getElementById('tablaCanalesAutomatizados');
   if(!tbody) return;
-  const canales=[{nombre:'IVR',campo:'gestIVR'},{nombre:'EMAIL',campo:'gestEmail'},{nombre:'SMS',campo:'gestSMS'}];
+  const canales=[
+    {nombre:'IVR',   campo:'gestIVR'},
+    {nombre:'EMAIL', campo:'gestEmail'},
+    {nombre:'SMS',   campo:'gestSMS'}
+  ];
   const filas=canales.map(c=>{
-    const total=datos.reduce((a,r)=>a+(r[c.campo]||0),0);
-    const conGest=datos.filter(r=>(r[c.campo]||0)>0).length;
-    const promedio=conGest>0?(total/conGest):0;
-    return {nombre:c.nombre,total,conGest,promedio};
+    const total   = datos.reduce((a,r)=>a+(r[c.campo]||0),0);
+    const conGest = datos.filter(r=>(r[c.campo]||0)>0).length;
+    const promedio= conGest>0?(total/conGest):0;
+    return {nombre:c.nombre, total, conGest, promedio};
   }).filter(f=>f.total>0);
-  if(filas.length===0){ tbody.innerHTML='<tr><td colspan="5" class="estado-msg">Sin gestiones automatizadas registradas para este agente.</td></tr>'; return; }
+
+  if(filas.length===0){
+    tbody.innerHTML='<tr><td colspan="5" class="estado-msg">Sin gestiones automatizadas registradas para este agente.</td></tr>';
+    return;
+  }
   const totalGeneral=filas.reduce((a,f)=>a+f.total,0);
   tbody.innerHTML=filas.map(f=>`
     <tr>
@@ -1075,10 +1363,19 @@ function renderCanalesAutomatizados(datos){
       <td>${f.conGest.toLocaleString('es-PE')}</td>
       <td>${f.promedio.toFixed(1)}</td>
     </tr>`).join('')
-  +`<tr class="fila-total-general"><td>TOTAL</td><td>${totalGeneral.toLocaleString('es-PE')}</td><td>100%</td><td>—</td><td>—</td></tr>`;
+  +`<tr class="fila-total-general">
+      <td>TOTAL</td>
+      <td>${totalGeneral.toLocaleString('es-PE')}</td>
+      <td>100%</td><td>—</td><td>—</td>
+    </tr>`;
 }
 
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') cerrarModalIA(); });
+// ============================================================
+// TECLADO — ESC cierra modal
+// ============================================================
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') cerrarModalIA();
+});
 
 </script>
 </body>
