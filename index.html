@@ -713,6 +713,9 @@
     <button id="subTabBtn3" class="subtab-btn inactivo" onclick="cambiarSubTab(3)">
       📅 Mapa Asistencia
     </button>
+<button id="subTabBtn4" class="subtab-btn inactivo" onclick="cambiarSubTab(4)">
+  📋 Detalle de Tramo
+</button>
   </div>
 
   <!-- SUB-TAB 1: Ranking -->
@@ -870,6 +873,208 @@
       <div class="estado-msg">Carga un archivo para ver el mapa de asistencia.</div>
     </div>
   </div>
+<!-- SUB-TAB 4: Detalle de Tramo -->
+<div id="subTab4Content" class="subtab-content" style="display:none;">
+
+  <!-- Filtros propios -->
+  <div style="background:linear-gradient(135deg,#1e3a5f,#0f4c81);
+              border-radius:12px;padding:14px 18px;margin-bottom:18px;
+              display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;
+              box-shadow:0 2px 8px rgba(15,76,129,0.2);">
+
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label style="color:#bfdbfe;font-size:11px;font-weight:700;
+                    text-transform:uppercase;letter-spacing:0.5px;">
+        💳 Tipo de Cuota
+      </label>
+      <div class="multiselect" id="msDTTipoCuota">
+        <button class="multiselect-btn" onclick="toggleMultiselect('msDTTipoCuota')"
+          style="background:rgba(255,255,255,0.15);color:#fff;
+                 border-color:rgba(255,255,255,0.3);min-width:200px;">
+          <span id="msDTTipoCuota_label">Todos los Tipos</span>
+          <span class="ms-arrow" style="color:#93c5fd;">▾</span>
+        </button>
+        <div class="multiselect-panel" id="msDTTipoCuota_panel">
+          <input type="text" class="ms-search" placeholder="Buscar tipo..."
+            oninput="filtrarOpcionesMultiselect('msDTTipoCuota',this.value)">
+          <label class="ms-select-all">
+            <input type="checkbox" id="msDTTipoCuota_all"
+              onchange="toggleSeleccionarTodoMultiselect('msDTTipoCuota')">
+            Seleccionar todos
+          </label>
+          <div class="ms-options" id="msDTTipoCuota_options"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label style="color:#bfdbfe;font-size:11px;font-weight:700;
+                    text-transform:uppercase;letter-spacing:0.5px;">
+        📊 Tramo
+      </label>
+      <div class="multiselect" id="msDTTramo">
+        <button class="multiselect-btn" onclick="toggleMultiselect('msDTTramo')"
+          style="background:rgba(255,255,255,0.15);color:#fff;
+                 border-color:rgba(255,255,255,0.3);min-width:200px;">
+          <span id="msDTTramo_label">Todos los Tramos</span>
+          <span class="ms-arrow" style="color:#93c5fd;">▾</span>
+        </button>
+        <div class="multiselect-panel" id="msDTTramo_panel">
+          <input type="text" class="ms-search" placeholder="Buscar tramo..."
+            oninput="filtrarOpcionesMultiselect('msDTTramo',this.value)">
+          <label class="ms-select-all">
+            <input type="checkbox" id="msDTTramo_all"
+              onchange="toggleSeleccionarTodoMultiselect('msDTTramo')">
+            Seleccionar todos
+          </label>
+          <div class="ms-options" id="msDTTramo_options"></div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="resetFiltrosDetalleTramo()"
+      style="background:rgba(255,255,255,0.15);color:#fff;
+             border:1px solid rgba(255,255,255,0.3);
+             padding:9px 14px;border-radius:8px;
+             font-size:12px;font-weight:700;">
+      🔄 Limpiar
+    </button>
+
+    <span id="dtFiltroActivo"
+      style="color:#93c5fd;font-size:12px;font-weight:600;
+             align-self:center;margin-left:4px;"></span>
+  </div>
+
+  <!-- Tabla de Asesores -->
+  <div style="margin-bottom:6px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <h3 style="margin:0;font-size:14px;color:var(--navy);">
+        👥 Resumen por Asesor
+      </h3>
+      <div style="font-size:12px;color:var(--slate-soft);margin-top:2px;">
+        Selecciona un asesor con ○ para ver sus cuentas en detalle abajo.
+      </div>
+    </div>
+    <span id="dtContadorAsesores"
+      style="font-size:12px;color:var(--slate-soft);font-weight:600;"></span>
+  </div>
+
+  <div style="overflow-x:auto;overflow-y:auto;max-height:380px;
+              border:1px solid var(--border);border-radius:10px;
+              margin-bottom:20px;">
+    <table style="min-width:1000px;width:100%;
+                  border-collapse:collapse;font-size:12.5px;">
+      <thead>
+        <tr>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;
+                     width:40px;text-align:center;">○</th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;
+                     min-width:200px;">Asesor</th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;
+                     min-width:180px;">Tramos que atiende</th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Clientes únicos
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Cuentas asignadas
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Cuentas por cobrar
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Gestiones
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Promesas
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            Monto cobrado
+          </th>
+          <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">
+            % Avance
+          </th>
+        </tr>
+      </thead>
+      <tbody id="dtTablaAsesores">
+        <tr>
+          <td colspan="10" class="estado-msg">
+            Carga un archivo para ver el detalle.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tabla de Cuentas del Asesor Seleccionado -->
+  <div id="dtSeccionCuentas" style="display:none;">
+    <div style="display:flex;align-items:center;gap:12px;
+                margin-bottom:12px;flex-wrap:wrap;">
+      <div>
+        <h3 style="margin:0;font-size:14px;color:var(--navy);" id="dtTituloCuentas">
+          📋 Cuentas del asesor
+        </h3>
+        <div style="font-size:12px;color:var(--slate-soft);margin-top:2px;"
+             id="dtSubtituloCuentas">
+          Mostrando todas las cuentas sin pago.
+        </div>
+      </div>
+
+      <!-- Toggle Sin/Con Pago propio -->
+      <div style="display:flex;background:var(--panel);
+                  border:1px solid var(--border);
+                  border-radius:20px;overflow:hidden;">
+        <button id="dtToggleSinPago" onclick="setDTToggle('sinpago')"
+          style="background:var(--navy);color:#fff;border:none;
+                 padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">
+          🔴 Sin Pago
+        </button>
+        <button id="dtToggleConPago" onclick="setDTToggle('conpago')"
+          style="background:transparent;color:var(--slate-soft);border:none;
+                 padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">
+          ✅ Con Pago
+        </button>
+      </div>
+
+      <span id="dtContadorCuentas"
+        style="font-size:12px;color:var(--slate-soft);
+               font-weight:600;margin-left:auto;"></span>
+    </div>
+
+    <div style="overflow-x:auto;overflow-y:auto;max-height:480px;
+                border:1px solid var(--border);border-radius:10px;">
+      <table style="min-width:1200px;width:100%;
+                    border-collapse:collapse;font-size:12.5px;">
+        <thead>
+          <tr>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">#</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">N° Op</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cód. Cliente</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;min-width:180px;">Cliente</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Ciclo</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tramo</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Cuota USD</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Días Mora</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">SBS</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Tipo Cuota</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Gestiones</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Mejor Contacto</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Último Estado</th>
+            <th style="position:sticky;top:0;background:#f8fafc;z-index:2;">Acción Sug.</th>
+          </tr>
+        </thead>
+        <tbody id="dtTablaCuentas">
+          <tr>
+            <td colspan="14" class="estado-msg">
+              Selecciona un asesor arriba para ver sus cuentas.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- fin subTab4Content -->
 
 </div><!-- fin tab2Content -->
 
@@ -2808,7 +3013,327 @@ function renderCanalesAutomatizados(datos){
       <td>—</td>
     </tr>`;
 }
+// ============================================================
+// DETALLE DE TRAMO — Variables
+// ============================================================
+let filtrosDT = { tipoCuota:[], tramo:[] };
+let dtAsesorSeleccionado = null;
+let dtToggleActivo = 'sinpago';
+
+// ============================================================
+// INICIALIZAR SUB-TAB 4
+// ============================================================
+function inicializarDetalleTramo(){
+  const tipos  = valoresUnicos('tipoCuota').filter(v=>v!=='');
+  const tramos = valoresUnicos('tramo').filter(v=>v!=='');
+
+  filtrosDT = { tipoCuota:[...tipos], tramo:[...tramos] };
+
+  inicializarMultiselect(
+    'msDTTipoCuota', tipos, filtrosDT, 'tipoCuota',
+    ()=>renderDetalleTramo()
+  );
+  inicializarMultiselect(
+    'msDTTramo', tramos, filtrosDT, 'tramo',
+    ()=>renderDetalleTramo()
+  );
+
+  dtAselorSeleccionado = null;
+  dtToggleActivo = 'sinpago';
+  renderDetalleTramo();
+}
+
+function resetFiltrosDetalleTramo(){
+  if(!masterDataCompleto.length) return;
+  filtrosDT.tipoCuota = valoresUnicos('tipoCuota').filter(v=>v!=='');
+  filtrosDT.tramo     = valoresUnicos('tramo').filter(v=>v!=='');
+  ['msDTTipoCuota','msDTTramo'].forEach(id=>{
+    renderOpcionesMultiselect(id);
+    actualizarLabelMultiselect(id);
+  });
+  dtAsesorSeleccionado = null;
+  document.getElementById('dtSeccionCuentas').style.display='none';
+  renderDetalleTramo();
+  mostrarToast('🔄 Filtros restablecidos','ok');
+}
+
+// ============================================================
+// DATOS FILTRADOS — SUB-TAB 4
+// ============================================================
+function datosFiltradosDT(){
+  // Parte de los datos ya filtrados del supervisor
+  const base = datosFiltradosSupervisor();
+  const setTipos  = new Set(filtrosDT.tipoCuota.map(t=>t.toUpperCase()));
+  const setTramos = new Set(filtrosDT.tramo);
+  return base.filter(r=>{
+    if(filtrosDT.tipoCuota.length>0 &&
+       !setTipos.has((r.tipoCuota||'').toUpperCase())) return false;
+    if(filtrosDT.tramo.length>0 &&
+       !setTramos.has(r.tramo)) return false;
+    return true;
+  });
+}
+
+// ============================================================
+// RENDER PRINCIPAL — SUB-TAB 4
+// ============================================================
+function renderDetalleTramo(){
+  if(!masterDataCompleto.length) return;
+  const datos   = datosFiltradosDT();
+  const agentes = [...new Set(
+    datos.filter(r=>!r.agenteSinAsignar&&r.agente).map(r=>r.agente)
+  )].sort();
+
+  document.getElementById('dtContadorAsesores').innerText =
+    `👥 ${agentes.length} asesores`;
+
+  // Actualizar badge de filtro activo
+  const tramosActivos = filtrosDT.tramo;
+  const regDTT = REGISTRO_MULTISELECT['msDTTramo'];
+  const todosTrm = !regDTT || tramosActivos.length===regDTT.opciones.length;
+  document.getElementById('dtFiltroActivo').innerText =
+    todosTrm ? '' : `📊 Filtrando: ${tramosActivos.join(' · ')}`;
+
+  const tbody = document.getElementById('dtTablaAsesores');
+
+  if(agentes.length===0){
+    tbody.innerHTML=
+      '<tr><td colspan="10" class="estado-msg">Sin datos para los filtros actuales.</td></tr>';
+    return;
+  }
+
+  // Colores para badges de tramo
+  const coloresBadge = [
+    {bg:'#dbeafe',color:'#1d4ed8'},
+    {bg:'#d1fae5',color:'#065f46'},
+    {bg:'#fef3c7',color:'#92400e'},
+    {bg:'#ede9fe',color:'#5b21b6'},
+    {bg:'#fee2e2',color:'#991b1b'},
+    {bg:'#e0f2fe',color:'#075985'}
+  ];
+
+  tbody.innerHTML = agentes.map(agente=>{
+    const d = datos.filter(r=>r.agente===agente);
+
+    // Métricas
+    const clientesUnicos = new Set(
+      d.map(r=>r.codigoCliente||r.idOperacion).filter(v=>v)
+    ).size;
+    const cuentasTotal   = d.length;
+    const cuentasSinPago = d.filter(r=>r.respp!=='CON PAGO').length;
+    const gestiones      = d.reduce((a,r)=>a+r.gest,0);
+    const promesas       = d.reduce((a,r)=>a+r.promesa,0);
+    const cuota          = d.reduce((a,r)=>a+r.cuota,0);
+    const pago           = d.filter(r=>r.respp==='CON PAGO')
+                            .reduce((a,r)=>a+r.pago,0);
+    const pctAvance      = cuota>0?(pago/cuota*100):0;
+    const semAv          = pctAvance>=25?'ka-sem-verde':
+                           pctAvance>=10?'ka-sem-amarillo':'ka-sem-rojo';
+    const icoAv          = pctAvance>=25?'✅':pctAvance>=10?'⚠️':'🔴';
+
+    // Tramos únicos del asesor (con los filtros aplicados)
+    const tramosAsesor = [...new Set(d.map(r=>r.tramo).filter(v=>v))].sort();
+    const badgesTramo  = tramosAsesor.map((t,i)=>{
+      const c = coloresBadge[i%coloresBadge.length];
+      return `<span style="background:${c.bg};color:${c.color};
+                           padding:2px 8px;border-radius:12px;
+                           font-size:10px;font-weight:700;
+                           white-space:nowrap;">${t}</span>`;
+    }).join(' ');
+
+    const esSeleccionado = dtAsesorSeleccionado===agente;
+
+    return `
+      <tr id="dtFila_${agente.replace(/[^a-zA-Z0-9]/g,'_')}"
+          style="cursor:pointer;
+                 background:${esSeleccionado?'#eff6ff':'transparent'};
+                 border-left:${esSeleccionado?'3px solid #2563eb':'3px solid transparent'};"
+          onclick="seleccionarAsesorDT('${agente.replace(/'/g,"\\'")}')">
+        <td style="text-align:center;">
+          <input type="radio" name="dtRadioAsesor"
+            ${esSeleccionado?'checked':''}
+            style="accent-color:#2563eb;width:16px;height:16px;cursor:pointer;"
+            onclick="seleccionarAsesorDT('${agente.replace(/'/g,"\\'")}')">
+        </td>
+        <td><strong style="color:var(--navy);">${agente}</strong></td>
+        <td>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            ${badgesTramo||'<span style="color:#94a3b8;font-size:11px;">—</span>'}
+          </div>
+        </td>
+        <td style="text-align:center;font-weight:700;">
+          ${clientesUnicos.toLocaleString('es-PE')}
+        </td>
+        <td style="text-align:center;">
+          ${cuentasTotal.toLocaleString('es-PE')}
+        </td>
+        <td style="text-align:center;">
+          <span style="color:#dc2626;font-weight:700;">
+            ${cuentasSinPago.toLocaleString('es-PE')}
+          </span>
+          <span style="color:#94a3b8;font-size:11px;">
+            (${cuentasTotal>0?(cuentasSinPago/cuentasTotal*100).toFixed(0):0}%)
+          </span>
+        </td>
+        <td style="text-align:center;">
+          ${gestiones.toLocaleString('es-PE')}
+        </td>
+        <td style="text-align:center;">
+          ${promesas.toLocaleString('es-PE')}
+        </td>
+        <td style="text-align:right;padding-right:12px;">
+          <strong style="color:#16a34a;">${formatoMoneda(pago)}</strong>
+        </td>
+        <td style="text-align:center;">
+          <span class="ka-semaforo ${semAv}">
+            ${icoAv} ${pctAvance.toFixed(1)}%
+          </span>
+        </td>
+      </tr>`;
+  }).join('');
+
+  // Si había un asesor seleccionado, re-renderizar su tabla
+  if(dtAsesorSeleccionado){
+    renderCuentasDT(dtAsesorSeleccionado);
+  }
+}
+
+// ============================================================
+// SELECCIONAR ASESOR — RADIO BUTTON
+// ============================================================
+function seleccionarAsesorDT(nombreAgente){
+  dtAsesorSeleccionado = nombreAgente;
+
+  // Actualizar estilos de filas
+  document.querySelectorAll('#dtTablaAsesores tr').forEach(tr=>{
+    tr.style.background   = 'transparent';
+    tr.style.borderLeft   = '3px solid transparent';
+  });
+  const idFila = 'dtFila_'+nombreAgente.replace(/[^a-zA-Z0-9]/g,'_');
+  const fila   = document.getElementById(idFila);
+  if(fila){
+    fila.style.background = '#eff6ff';
+    fila.style.borderLeft = '3px solid #2563eb';
+  }
+
+  // Mostrar sección de cuentas
+  const seccion = document.getElementById('dtSeccionCuentas');
+  seccion.style.display = 'block';
+
+  // Actualizar título
+  document.getElementById('dtTituloCuentas').innerHTML =
+    `📋 Cuentas de <span style="color:#2563eb;">${nombreAgente}</span>`;
+
+  // Renderizar tabla de cuentas
+  renderCuentasDT(nombreAgente);
+
+  // Scroll suave a la sección
+  setTimeout(()=>{
+    seccion.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+
+// ============================================================
+// TOGGLE SIN/CON PAGO — SUB-TAB 4
+// ============================================================
+function setDTToggle(modo){
+  dtToggleActivo = modo;
+  const btnSin = document.getElementById('dtToggleSinPago');
+  const btnCon = document.getElementById('dtToggleConPago');
+  btnSin.style.background = modo==='sinpago'?'var(--navy)':'transparent';
+  btnSin.style.color       = modo==='sinpago'?'#fff':'var(--slate-soft)';
+  btnCon.style.background  = modo==='conpago'?'var(--navy)':'transparent';
+  btnCon.style.color        = modo==='conpago'?'#fff':'var(--slate-soft)';
+  if(dtAsesorSeleccionado) renderCuentasDT(dtAsesorSeleccionado);
+}
+
+// ============================================================
+// RENDER TABLA DE CUENTAS — SUB-TAB 4
+// ============================================================
+function renderCuentasDT(nombreAgente){
+  const tbody = document.getElementById('dtTablaCuentas');
+  const datos = datosFiltradosDT();
+  const base  = datos.filter(r=>r.agente===nombreAgente);
+
+  const filtradas = dtToggleActivo==='sinpago'
+    ? base.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0)
+    : base.filter(r=>r.respp==='CON PAGO');
+
+  const ordenadas = [...filtradas].sort((a,b)=>b.cuota-a.cuota);
+
+  // Actualizar subtítulo
+  const tramosEnVista = [...new Set(base.map(r=>r.tramo).filter(v=>v))].sort();
+  document.getElementById('dtSubtituloCuentas').innerText =
+    `Tramos: ${tramosEnVista.join(' · ')||'—'} · `+
+    `${dtToggleActivo==='sinpago'?'Sin pago':'Con pago'} · `+
+    `${ordenadas.length} cuentas`;
+
+  // Contador
+  document.getElementById('dtContadorCuentas').innerHTML =
+    `📋 <strong>${ordenadas.length.toLocaleString('es-PE')}</strong> cuentas`;
+
+  if(ordenadas.length===0){
+    tbody.innerHTML=`<tr><td colspan="14" class="estado-msg">
+      Sin cuentas ${dtToggleActivo==='sinpago'?'sin pago':'con pago'}
+      para este asesor con los filtros actuales.
+    </td></tr>`;
+    return;
+  }
+
+  const statsLocal = {
+    totalGest:  base.reduce((a,r)=>a+r.gest,0),
+    totalContac:base.reduce((a,r)=>a+r.contac,0),
+    totalQ:     base.length,
+    cuentasPagadas: base.filter(r=>r.respp==='CON PAGO').length,
+    pctContac:  0, pctAvance:0
+  };
+
+  tbody.innerHTML = ordenadas.map((r,i)=>`
+    <tr class="${r.diasVencimiento>60?'fila-urgente':
+                r.diasVencimiento>30?'fila-atencion':''}">
+      <td>${i+1}</td>
+      <td style="font-size:12px;font-weight:700;color:#2563eb;">
+        ${r.idOperacion||'—'}
+      </td>
+      <td style="font-size:11px;color:var(--slate-soft);">
+        ${r.codigoCliente||'—'}
+      </td>
+      <td><strong>${r.cliente}</strong></td>
+      <td style="font-size:11px;">${r.ciclo}</td>
+      <td>
+        <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;
+                     border-radius:10px;font-size:11px;font-weight:700;">
+          ${r.tramo}
+        </span>
+      </td>
+      <td><strong>${formatoMoneda(r.cuota)}</strong></td>
+      <td><strong>${r.diasVencimiento??'—'}</strong></td>
+      <td>${badgeSBS(r.calificacionSBS)}</td>
+      <td>${r.tipoCuota||'—'}</td>
+      <td style="text-align:center;">${r.gest}</td>
+      <td>${r.mejorTipoContacto||'—'}</td>
+      <td style="font-size:11px;">${r.ultimoEstadoGestion}</td>
+      <td>${accionSugerida(r,statsLocal)}</td>
+    </tr>`).join('');
+}
+
+// ============================================================
+// ACTUALIZAR cambiarSubTab para incluir sub-tab 4
+// ============================================================
+// REEMPLAZA tu función cambiarSubTab existente con esta:
+function cambiarSubTab(n){
+  subTabActivo = n;
+  [1,2,3,4].forEach(i=>{
+    const cont = document.getElementById(`subTab${i}Content`);
+    const btn  = document.getElementById(`subTabBtn${i}`);
+    if(cont) cont.style.display = i===n?'block':'none';
+    if(btn)  btn.className = 'subtab-btn '+(i===n?'activo':'inactivo');
+  });
+  if(n===3) renderHeatmap();
+  if(n===4&&masterDataCompleto.length>0) inicializarDetalleTramo();
+}
 
 </script>
 </body>
 </html>
+
