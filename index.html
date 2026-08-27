@@ -793,6 +793,18 @@
           ✅ Con Pago
         </button>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;color:var(--slate-soft);font-weight:700;">
+          🚩 Seguimiento:
+        </span>
+        <select id="supFlagSeguimiento" onchange="setFlagSeguimiento(this.value)"
+          style="min-width:180px;padding:7px 10px;font-size:12px;">
+          <option value="todos">Todos</option>
+          <option value="sinpago">🔴 Sin pago</option>
+          <option value="pagado">🟢 Pagado</option>
+          <option value="solucionado">🔵 Solucionado</option>
+        </select>
+      </div>
       <span id="supClientesContador"
         style="font-size:12px;color:var(--slate-soft);
                font-weight:600;margin-left:auto;"></span>
@@ -1100,8 +1112,8 @@
 let rawRows = [];
 let masterDataCompleto = [];
 let masterData = [];
-let filtrosPanel = { ciclo:[], mes:[], estadoCuenta:[] };
-let filtrosSup   = { ciclo:[], mes:[], tramo:[], sbs:[] };
+let filtrosPanel = { ciclo2:[], mes:[], estadoCuenta:[] };
+let filtrosSup   = { ciclo2:[], mes:[], tramo:[], sbs:[] };
 let chartAgenteTCInst, chartAgenteCanalInst;
 let chartAgenteGestionDiariaInst, chartAgenteRecuperoDiarioInst;
 let _iaUltimosGrupos = {};
@@ -1110,6 +1122,7 @@ let tabActivo    = 1;
 let subTabActivo = 1;
 let rankToggleActivo     = 1;
 let toggleClientesActivo = 'sinpago';
+let flagSeguimientoActivo = 'todos';
 
 // ============================================================
 // AUTOCARGA
@@ -1323,6 +1336,7 @@ function construirDatasetMaestro(callbackFin){
         idOperacion:    resolverColumna(f,'OPERACION','NRO_OPERACION','ID_OPERACION').toString().trim(),
         codigoCliente:  resolverColumna(f,'CODIGO_CLIENTE','COD_CLIENTE','ID_CLIENTE').toString().trim(),
         ciclo:          limpiarCiclo(resolverColumna(f,'CICLO','NRO_CICLO','CICLO_COBRO')||''),
+        ciclo2:         normalizarCiclo2(resolverColumna(f,'CICLO2','CICLO_2')||''),
         mes:            resolverColumna(f,'MES','PERIODO','MES_GESTION').toString().trim().toUpperCase(),
         tramo:          resolverColumna(f,'TRAMO','TRAMO_MORA','BUCKET').toString().trim(),
         cliente:        resolverColumna(f,'CLIENTE','NOMBRE_CLIENTE','RAZON_SOCIAL').toString().trim(),
@@ -1377,10 +1391,22 @@ function construirDatasetMaestro(callbackFin){
 const REGISTRO_MULTISELECT = {};
 const ORDEN_MESES = {ENE:1,FEB:2,MAR:3,ABR:4,MAY:5,JUN:6,JUL:7,AGO:8,SET:9,SEP:9,OCT:10,NOV:11,DIC:12};
 
+function normalizarCiclo2(v){
+  const t=(v??'').toString().trim();
+  if(t==='') return '';
+  const n=Number(t);
+  return Number.isFinite(n) ? String(Math.trunc(n)).padStart(2,'0') : t.toUpperCase();
+}
+
+const ORDEN_CICLO2 = {'04':1,'11':2,'18':3,'25':4};
+
 function ordenarOpciones(campo,opciones){
   if(campo==='mes') return [...opciones].sort((a,b)=>
     (ORDEN_MESES[a.toString().trim().toUpperCase()]??99)-
     (ORDEN_MESES[b.toString().trim().toUpperCase()]??99));
+  if(campo==='ciclo2') return [...opciones].sort((a,b)=>
+    (ORDEN_CICLO2[normalizarCiclo2(a)]??99)-(ORDEN_CICLO2[normalizarCiclo2(b)]??99) ||
+    normalizarCiclo2(a).localeCompare(normalizarCiclo2(b),undefined,{numeric:true}));
   return [...opciones].sort();
 }
 function inicializarMultiselect(id,opciones,filtroObjRef,campoFiltro,callbackRender){
@@ -1502,10 +1528,38 @@ function setToggleClientes(modo){
 }
 
 // ============================================================
+// FLAG DE SEGUIMIENTO — TOP CLIENTES
+// Solo afecta la tabla Top Clientes.
+// ============================================================
+function setFlagSeguimiento(modo){
+  flagSeguimientoActivo = modo || 'todos';
+  renderTopClientes(datosFiltradosSupervisor());
+}
+
+function obtenerFlagSeguimiento(r){
+  // Regla objetiva: si existe monto de pago, la cuenta está PAGADA.
+  if((r.pago||0) > 0 || r.respp === 'CON PAGO') return 'pagado';
+
+  // "SOLUCIONADO" solo se marca cuando la propia base contiene
+  // explícitamente esa condición en alguno de sus campos de estado/resultado.
+  const textos = [
+    r.estado,
+    r.ultimoEstadoGestion,
+    r.ultimoMotivo,
+    r.ultimaObservacion,
+    r.mejorResultadoCampo
+  ].map(v=>(v||'').toString().trim().toUpperCase());
+
+  if(textos.some(v=>v.includes('SOLUCION'))) return 'solucionado';
+
+  return 'sinpago';
+}
+
+// ============================================================
 // INICIALIZAR FILTROS — TAB 1
 // ============================================================
 function inicializarFiltros(){
-  const ciclos  = valoresUnicos('ciclo');
+  const ciclos2 = valoresUnicos('ciclo2').filter(v=>v!=='');
   const meses   = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
   const estados = valoresUnicos('estado').filter(v=>v!==''&&v!==null&&v!==undefined)
     .map(v=>v.toString().trim().toUpperCase());
@@ -1514,20 +1568,20 @@ function inicializarFiltros(){
     a.toUpperCase()!=='SIN ASIGNAR'&&
     !a.toUpperCase().startsWith('0 - USER'));
 
-  filtrosPanel = { ciclo:[...ciclos], mes:[...meses], estadoCuenta:[...estados] };
+  filtrosPanel = { ciclo2:[...ciclos2], mes: [...meses], estadoCuenta:[...estados] };
 
   const sel = document.getElementById('selectorAgentePanel');
   sel.innerHTML = '<option value="">— Selecciona un agente —</option>'
     +agentes.sort().map(a=>`<option value="${a}">${a}</option>`).join('');
 
-  inicializarMultiselect('msCicloPanel',  ciclos,  filtrosPanel,'ciclo',       ()=>renderMiPanel());
+  inicializarMultiselect('msCicloPanel',  ciclos2, filtrosPanel,'ciclo2',      ()=>renderMiPanel());
   inicializarMultiselect('msMesPanel',    meses,   filtrosPanel,'mes',         ()=>renderMiPanel());
   inicializarMultiselect('msEstadoPanel', estados, filtrosPanel,'estadoCuenta',()=>renderMiPanel());
 }
 
 function resetFiltrosPanel(){
   if(!masterDataCompleto.length) return;
-  filtrosPanel.ciclo        = valoresUnicos('ciclo');
+  filtrosPanel.ciclo2       = valoresUnicos('ciclo2').filter(v=>v!=='');
   filtrosPanel.mes          = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
   filtrosPanel.estadoCuenta = valoresUnicos('estado').filter(v=>v!=='')
     .map(v=>v.toString().trim().toUpperCase());
@@ -1579,16 +1633,16 @@ function datosFiltradosPanel(){
   const agente = document.getElementById('selectorAgentePanel')?.value||'';
   if(!agente) return [];
   const baseAgente = masterDataCompleto.filter(r=>r.agente===agente);
-  const ciclosDelAgente = [...new Set(baseAgente.map(r=>r.ciclo))];
+  const ciclosDelAgente = [...new Set(baseAgente.map(r=>r.ciclo2).filter(Boolean))];
   const mesesDelAgente  = [...new Set(baseAgente.map(r=>r.mes))];
   const regCiclo = REGISTRO_MULTISELECT['msCicloPanel'];
   const regMes   = REGISTRO_MULTISELECT['msMesPanel'];
-  const todosCiclos = !regCiclo||filtrosPanel.ciclo.length===0||
-    filtrosPanel.ciclo.length===regCiclo.opciones.length;
+  const todosCiclos = !regCiclo||filtrosPanel.ciclo2.length===0||
+    filtrosPanel.ciclo2.length===regCiclo.opciones.length;
   const todosMeses  = !regMes||filtrosPanel.mes.length===0||
     filtrosPanel.mes.length===regMes.opciones.length;
   const setCiclos = new Set(todosCiclos?ciclosDelAgente:
-    filtrosPanel.ciclo.filter(c=>ciclosDelAgente.includes(c)));
+    filtrosPanel.ciclo2.filter(c=>ciclosDelAgente.includes(c)));
   const setMeses  = new Set(todosMeses?mesesDelAgente:
     filtrosPanel.mes.map(m=>m.toString().trim().toUpperCase())
       .filter(m=>mesesDelAgente.includes(m)));
@@ -1600,7 +1654,7 @@ function datosFiltradosPanel(){
   actualizarBadgeFecha();
   const {desde,hasta} = getFiltroFechas();
   return baseAgente.filter(r=>{
-    if(!setCiclos.has(r.ciclo)) return false;
+    if(!setCiclos.has(r.ciclo2)) return false;
     if(!setMeses.has(r.mes.toString().trim().toUpperCase())) return false;
     if(setEstados&&!setEstados.has(r.estado.trim().toUpperCase())) return false;
     if(desde||hasta){
@@ -1617,17 +1671,17 @@ function datosFiltradosPanel(){
 // INICIALIZAR FILTROS — TAB 2 SUPERVISOR
 // ============================================================
 function inicializarFiltrosSupervisor(){
-  const ciclos  = valoresUnicos('ciclo');
+  const ciclos2 = valoresUnicos('ciclo2').filter(v=>v!=='');
   const meses   = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
   const tramos  = valoresUnicos('tramo').filter(v=>v!=='');
   const sbsVals = valoresUnicos('calificacionSBS').filter(v=>v!=='');
 
   filtrosSup = {
-    ciclo:[...ciclos], mes:[...meses],
+    ciclo2:[...ciclos2], mes:[...meses],
     tramo:[...tramos], sbs:[...sbsVals]
   };
 
-  inicializarMultiselect('msSupCiclo',  ciclos,  filtrosSup,'ciclo', ()=>renderSupervisor());
+  inicializarMultiselect('msSupCiclo',  ciclos2, filtrosSup,'ciclo2', ()=>renderSupervisor());
   inicializarMultiselect('msSupMes',    meses,   filtrosSup,'mes',   ()=>renderSupervisor());
   inicializarMultiselect('msSupTramo',  tramos,  filtrosSup,'tramo', ()=>renderSupervisor());
   inicializarMultiselect('msSupSBS',    sbsVals, filtrosSup,'sbs',   ()=>renderSupervisor());
@@ -1642,7 +1696,7 @@ function inicializarFiltrosSupervisor(){
 
 function resetFiltrosSupervisor(){
   if(!masterDataCompleto.length) return;
-  filtrosSup.ciclo  = valoresUnicos('ciclo');
+  filtrosSup.ciclo2 = valoresUnicos('ciclo2').filter(v=>v!=='');
   filtrosSup.mes    = valoresUnicos('mes').map(v=>v.toString().trim().toUpperCase());
   filtrosSup.tramo  = valoresUnicos('tramo').filter(v=>v!=='');
   filtrosSup.sbs    = valoresUnicos('calificacionSBS').filter(v=>v!=='');
@@ -1652,6 +1706,9 @@ function resetFiltrosSupervisor(){
   });
   const inp = document.getElementById('supBuscadorOp');
   if(inp) inp.value='';
+  flagSeguimientoActivo = 'todos';
+  const flagSel = document.getElementById('supFlagSeguimiento');
+  if(flagSel) flagSel.value = 'todos';
   renderSupervisor();
   mostrarToast('🔄 Filtros supervisor restablecidos','ok');
 }
@@ -1661,13 +1718,13 @@ function resetFiltrosSupervisor(){
 // ============================================================
 function datosFiltradosSupervisor(){
   const buscador = (document.getElementById('supBuscadorOp')?.value||'').trim().toLowerCase();
-  const setCiclos = new Set(filtrosSup.ciclo);
+  const setCiclos = new Set(filtrosSup.ciclo2);
   const setMeses  = new Set(filtrosSup.mes.map(m=>m.toString().trim().toUpperCase()));
   const setTramos = new Set(filtrosSup.tramo);
   const setSBS    = new Set(filtrosSup.sbs.map(s=>s.toString().trim().toUpperCase()));
 
   return masterDataCompleto.filter(r=>{
-    if(!setCiclos.has(r.ciclo)) return false;
+    if(!setCiclos.has(r.ciclo2)) return false;
     if(!setMeses.has(r.mes.toString().trim().toUpperCase())) return false;
     if(filtrosSup.tramo.length>0&&!setTramos.has(r.tramo)) return false;
     if(filtrosSup.sbs.length>0&&
@@ -1837,7 +1894,7 @@ function renderRankingAsesores(datos){
 // BOTÓN VER → DETALLE ASESOR
 // ============================================================
 function irADetalleAsesor(nombreAgente){
-  filtrosPanel.ciclo = [...filtrosSup.ciclo];
+  filtrosPanel.ciclo2 = [...filtrosSup.ciclo2];
   filtrosPanel.mes   = [...filtrosSup.mes];
   ['msCicloPanel','msMesPanel'].forEach(id=>{
     renderOpcionesMultiselect(id);
@@ -1856,9 +1913,17 @@ function irADetalleAsesor(nombreAgente){
 // ============================================================
 function renderTopClientes(datos){
   const tbody    = document.getElementById('supTablaClientes');
-  const filtrados= toggleClientesActivo==='sinpago'
-    ?datos.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0)
-    :datos.filter(r=>r.respp==='CON PAGO');
+  let filtrados = datos;
+
+  // Se conserva el toggle existente Sin Pago / Con Pago.
+  filtrados = toggleClientesActivo==='sinpago'
+    ?filtrados.filter(r=>r.respp!=='CON PAGO'&&r.cuota>0)
+    :filtrados.filter(r=>r.respp==='CON PAGO');
+
+  // Nuevo Flag de seguimiento: solo modifica Top Clientes.
+  if(flagSeguimientoActivo!=='todos'){
+    filtrados = filtrados.filter(r=>obtenerFlagSeguimiento(r)===flagSeguimientoActivo);
+  }
   const ordenados= [...filtrados].sort((a,b)=>b.cuota-a.cuota);
   document.getElementById('supClientesContador').innerHTML=
     `📋 <strong>${ordenados.length.toLocaleString('es-PE')}</strong> cuentas`;
@@ -2266,11 +2331,11 @@ function renderMiPanel(){
     {weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('agenteNombreDisplay').innerText = agente||'Sin selección';
 
-  const totalCiclos  = valoresUnicos('ciclo').length;
+  const totalCiclos  = valoresUnicos('ciclo2').filter(v=>v!=='').length;
   const totalMeses   = valoresUnicos('mes').length;
   const totalEstados = valoresUnicos('estado').length;
-  const lC = filtrosPanel.ciclo.length===0||filtrosPanel.ciclo.length===totalCiclos
-    ?'Todos los ciclos':filtrosPanel.ciclo.length+' ciclo(s)';
+  const lC = filtrosPanel.ciclo2.length===0||filtrosPanel.ciclo2.length===totalCiclos
+    ?'Todos los ciclos':filtrosPanel.ciclo2.length+' ciclo(s)';
   const lM = filtrosPanel.mes.length===0||filtrosPanel.mes.length===totalMeses
     ?'Todos los meses':filtrosPanel.mes.length+' mes(es)';
   const lE = filtrosPanel.estadoCuenta.length===0||filtrosPanel.estadoCuenta.length===totalEstados
@@ -3336,4 +3401,3 @@ function cambiarSubTab(n){
 </script>
 </body>
 </html>
-
